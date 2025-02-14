@@ -1,0 +1,117 @@
+Tabelas:
+
+Clientes (cliente)
+Clientes cadastrados ao realizar a geração de um contrato se CPF não existir no banco de dados.
+    id_cliente SERIAL PRIMARY KEY,
+    nome VARCHAR(45) NOT NULL,
+    cpf VARCHAR(11) NOT NULL UNIQUE,
+    telefone VARCHAR(11) NOT NULL,
+    endereco VARCHAR(60)
+
+Equipamentos (equipamento)
+Contém os equipamentos disponíveis para aluguel. Pode ser cadastrado no sistema
+    id_equip SERIAL PRIMARY KEY,
+    descricao VARCHAR(60) NOT NULL,
+    vlr_diaria DOUBLE PRECISION NOT NULL,
+    vlr_mensal DOUBLE PRECISION NOT NULL,
+    qtd_total INT NOT NULL,
+    qtd_disponivel INT NOT NULL DEFAULT 0
+
+Contratos (contrato)
+Registra as informações sobre cada aluguel, como o cliente, o equipamento alugado e o período de locação.
+    id_contrato SERIAL PRIMARY KEY,
+	tipo INT NOT NULL, -- 1 para mensal, 2 para diário
+    id_cliente INT NOT NULL,
+    id_equip INT NOT NULL,
+    qtd_equip INT NOT NULL,
+    data_inicio TIMESTAMP NOT NULL, -- Data de início do contrato
+    data_fim TIMESTAMP NOT NULL, -- Data de término prevista do contrato
+    data_entrega TIMESTAMP, -- Data real de entrega
+    status VARCHAR(1) NOT NULL DEFAULT 'A', -- Status do contrato ('A' para ativo, 'F' para finalizado, 'C' para cancelado)
+    FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente),
+    FOREIGN KEY (id_equipamento) REFERENCES equipamento(id_equipamento)
+
+Totalização (totalizacao)
+Registra o valor final do contrato, que é calculado ao finalizar ou cancelar o mesmo.
+	id_tot SERIAL PRIMARY KEY,
+	id_contrato INT NOT NULL UNIQUE,
+	multa DOUBLE PRECISION,
+	juros DOUBLE PRECISION,
+	vlr_total DOUBLE PRECISION NOT NULL,
+	FOREIGN KEY (id_contrato) REFERENCES contrato(id_contrato)
+
+Relacionamentos:
+Clientes x Contratos: Um cliente pode ter vários contratos, mas cada contrato pertence a um único cliente.
+Equipamentos x Contratos: Um contrato envolve um equipamento, mas cada equipamento pode estar em vários contratos.
+Contratos x Totalização: Cada totalização possui um único contrato, mas um contrato pode não possuir uma totalização
+
+**************************************************************
+
+Requisitos:
+- Devera ser possivel cadastrar cliente
+    - O cadastro ocorre no momento da geração do contrato, o CPF será o primeiro dado a ser preenchido, caso não exista no banco de dados, será realizado o seu cadastro solicitando as demais informações, se existir no banco de dados sera prosseguido com o cadastro do contrato sem solicitar demais informações do cliente
+- Devera ser possivel alterar um cliente;
+    - O cliente pode ser alterado apenas se não possuir contrato ativo;
+- Devera ser possivel deletar um cliente;
+    - O cliente deve ser deletado apenas se não possuir contrato ativo
+- Devera ser possivel cadastrar um equipamento;
+- Devera ser possivel alterar um equipamento;
+    - Ao alterar a qtd_total do equipamento, um trigger automaticamente ajustara a qtd_disponivel;
+    - Os valores do equipamento podem ser alterados apenas se não possuir contrato ativo;
+- Devera ser possivel deletar um equipamento;
+    - Um equipamento pode ser deletado apenas se não possuir contrato ativo;
+- Devera ser possivel cadastrar um contrato;
+    - Não deve ser permitido o alugel de equipamentos com qtd_equip maior que qtd_disponivel
+    - Não deve ser permitido o alugel quando a data inicio e/ou fim for menor que a atual(data de processamento)
+- Devera ser possivel finalizar um contrato;
+- Devera ser possivel cancelar um contrato;
+- Devera ser apresentado um relatorio ao finalizar/cancelar um contrato listando os valores totais
+- Deverá ser possivel alterar a data de processamento do sistema, para que as demais funções do codigo possa ser realizada;
+    - A data de processamento deve ser gravada em uma variavel sempre que iniciado o sistema, capturando a data atual, mas podera ser alterada posteriormente para realização dos testes;
+    - Ela sera utilizada para realizar os calculos de multa, juros e entrega do equipamento;
+
+
+Regras de Negócio:
+Cálculo do Valor Total:
+- Se tipo = 1 (mensal), o vlr_total deve ser baseado no vlr_mensal do equipamento multiplicado pelo número de meses contratados.
+- Se tipo = 2 (diário), o vlr_total deve ser baseado no vlr_diaria do equipamento multiplicado pelo número de dias contratados.
+
+Cálculo da Multa/Juros:
+- Se o contrato for cancelado antes do término, a multa deve ser calculada com base no tempo restante e no tipo de contrato.
+    Exemplo:
+    Para contratos mensais: Multa = 20% do valor mensal.
+    Para contratos diários: Multa = 50% do valor diário por dia restante.
+- Se o contrato for finalizado depois do tempo de término, a multa e juros devem ser calculados com base no tempo restante e no tipo de contrato.
+    Exemplo:
+    Para contrato mensais: Multa = 50% do valor mensal + 10% de juros diários sobre o valor total(considerando os juros anteriores)
+    Para contratos diarios: Multa = 70% do valor diario + 10% de juros diários sobre o valor total(considerando os juros anteriores)
+
+Atualização do Status do Contrato:
+- Quando o equipamento for alugado, o campo status deve ser atualizado para 'A';
+- Quando o equipamento for entregue, o campo data_entrega deve ser preenchido, e o status deve ser atualizado para 'F'.
+- Se o contrato for cancelado, o status deve ser atualizado para 'C'.
+    - O contrato pode ser cancelado apenas se a data de processamento for menor que a data_fim do contrato.
+
+Atualização da Quantidade do equipamento (Automatico):
+- Quando o equipamento for cadastrado, a qtd_disponivel deve ser igual a qtd_total;
+    - Avaliar fazer a inserção de qtd_disponivel através de Trigger na tabela Equipamento;
+- Quando o equipamento for alugado, a qtd_disponivel dele deve ser calculada pela subtração da qtd_disponivel-qtd_equip;
+    - Um trigger realizará essa função automaticamente ao criar um contrato;
+- Quando o equipamento for entregue(contrato finalizado ou cancelado), a qtd_disponivel dele deve ser atualizada pela soma de qtd_disponivel+qtd_equip;
+    - Um trigger realizará essa função automaticamente ao alterar um contrato(um contrato é alterado apenas quando finalizado ou cancelado);
+
+Totalização do Contrato:
+- Quando o equipamento for entregue, deverá ser gerado um registro de totalização para o contrato;
+    - Se a entrega for realizada antes da data_fim ou na própria, o campo valor_total deve ser calculado conforme 'Calculo do Valor Total';
+    - Se a entrega for realizada depois da data_fim, os campos multa, juros e valor_total devem ser calculados e preenchidos conforme 'Calculo do Valor Total' e 'Calculo da Multa/Juros';
+    - Se o contrato for cancelado, o campo multa e valor_total devem ser calculados e preenchidos conforme 'Calculo do Valor Total' e 'Calculo da Multa/Juros'
+
+Fluxo Contrato x Totalização:
+- Criação do Contrato:
+    Um contrato é criado na tabela contrato.
+    A tabela totalizacao ainda não é preenchida.
+- Finalização ou Encerramento do Contrato:
+    Quando o contrato é finalizado ou encerrado, o sistema calcula o valor_total, multa e juros.
+    Esses valores são inseridos na tabela totalizacao.
+- Consulta dos Valores:
+    Para obter os valores totais de um contrato, basta fazer um JOIN entre as tabelas contrato e totalizacao.

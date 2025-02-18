@@ -1,3 +1,5 @@
+CREATE DATABASE Aluguel;
+
 -- Clientes
 CREATE TABLE cliente (
 	id_cliente SERIAL PRIMARY KEY,

@@ -14,4 +14,8 @@ public class ClienteController {
     public Cliente verificarCPF (String cpf) {
         return clienteDAO.verificarCPF(cpf);
     }
+
+    public String deletarCliente (String cpf) {
+        return clienteDAO.deletarCliente(cpf);
+    }
 }

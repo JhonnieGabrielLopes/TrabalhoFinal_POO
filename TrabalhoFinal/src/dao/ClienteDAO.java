@@ -21,7 +21,6 @@ public class ClienteDAO {
             conn.close();
             return "Cliente cadastrado com sucesso!";
         } catch (SQLException e) {
-            e.printStackTrace();
             return "Erro ao cadastrar cliente";
         }
     }
@@ -40,4 +39,18 @@ public class ClienteDAO {
             return null;
         }
     }
+
+    public String deletarCliente (String cpf) {
+        String sql = "DELETE FROM cliente WHERE cpf = ?";
+        try (Connection conn = ConexaoDAO.getConnection();){
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, cpf);
+            stmt.executeUpdate();
+            stmt.close();
+            conn.close();
+            return "Cliente deletado com sucesso!";
+        } catch (SQLException e) {
+            return "Erro ao deletar cliente";
+        }
+    } 
 }

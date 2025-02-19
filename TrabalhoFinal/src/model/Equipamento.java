@@ -7,6 +7,13 @@ public class Equipamento {
     private int qtd_total;
     private int qtd_disponivel;
 
+    public Equipamento(String descricao, double vlr_diaria, double vlr_mensal, int qtd_total) {
+        this.descricao = descricao;
+        this.vlr_diaria = vlr_diaria;
+        this.vlr_mensal = vlr_mensal;
+        this.qtd_total = qtd_total;
+    }
+
     public Equipamento(String descricao, double vlr_diaria, double vlr_mensal, int qtd_total, int qtd_disponivel) {
         this.descricao = descricao;
         this.vlr_diaria = vlr_diaria;

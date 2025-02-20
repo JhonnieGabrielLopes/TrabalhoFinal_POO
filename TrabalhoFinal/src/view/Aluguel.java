@@ -343,7 +343,7 @@ public class Aluguel {
         }
         System.out.print("Informe o ID do Contrato que deseja encerrar: ");
         int id= scanner.nextInt();
-        System.out.println(contratoController.encerrarContrato(id, forma, dataAtual));
+        System.out.println("\n"+contratoController.encerrarContrato(id, forma, dataAtual));
         Contrato contrato = contratoController.buscarContrato(id);
         Equipamento equipamento = equipamentoController.buscarEquipamento(contrato.getIdEquip());
         LocalDate dataFim = LocalDate.parse(contrato.getDataFim());

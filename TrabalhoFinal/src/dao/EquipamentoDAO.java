@@ -63,4 +63,19 @@ public class EquipamentoDAO {
         }
         return equipamentos;
     }
+    
+    public String deletarEquipamento (int id) {
+        String sql = "DELETE FROM equipamento WHERE id_equip = ?";
+        try (Connection conn = ConexaoDAO.getConnection();){
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+            stmt.close();
+            conn.close();
+            return "Equipamento deletado com sucesso!";
+        } catch (SQLException e) {
+            return "Erro ao deletar equipamento";
+        }
+    }
+
 }

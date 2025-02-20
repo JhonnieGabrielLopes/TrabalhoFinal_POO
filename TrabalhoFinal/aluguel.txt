@@ -50,8 +50,7 @@ Contratos x Totalização: Cada totalização possui um único contrato, mas um 
 Requisitos:
 - Devera ser possivel cadastrar cliente
     - O cadastro ocorre no momento da geração do contrato, o CPF será o primeiro dado a ser preenchido, caso não exista no banco de dados, será realizado o seu cadastro solicitando as demais informações, se existir no banco de dados sera prosseguido com o cadastro do contrato sem solicitar demais informações do cliente
-- Devera ser possivel alterar um cliente;
-    - O cliente deve ser deletado apenas se não possuir contrato ativo
+
 - Devera ser possivel cadastrar um equipamento;
 - Devera ser possivel alterar um equipamento;
     - Ao alterar a qtd_total do equipamento, um trigger automaticamente ajustara a qtd_disponivel;
@@ -60,11 +59,9 @@ Requisitos:
     - Um equipamento pode ser deletado apenas se não possuir contrato ativo;
 - Devera ser possivel cadastrar um contrato;
     - Não deve ser permitido o alugel de equipamentos com qtd_equip maior que qtd_disponivel
-    - Não deve ser permitido o alugel quando a data inicio e/ou fim for menor que a atual(data de processamento)
 - Devera ser possivel finalizar um contrato;
 - Devera ser possivel cancelar um contrato;
 - Devera ser apresentado um relatorio ao finalizar/cancelar um contrato listando os valores totais
-- Deverá ser possivel alterar a data de processamento do sistema, para que as demais funções do codigo possa ser realizada;
     - A data de processamento deve ser gravada em uma variavel sempre que iniciado o sistema, capturando a data atual, mas podera ser alterada posteriormente para realização dos testes;
     - Ela sera utilizada para realizar os calculos de multa, juros e entrega do equipamento;
 

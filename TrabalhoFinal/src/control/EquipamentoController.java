@@ -1,7 +1,6 @@
 package control;
 
 import java.util.ArrayList;
-
 import dao.EquipamentoDAO;
 import model.Equipamento;
 
@@ -20,4 +19,9 @@ public class EquipamentoController {
     public String alterarEquipamento (int id, int campo, String novoValor) {
         return equipamentoDAO.alterarEquipamento(id, campo, novoValor);
     }
+
+    public String deletarEquipamento (int id) {
+        return equipamentoDAO.deletarEquipamento(id);
+    }
+
 }

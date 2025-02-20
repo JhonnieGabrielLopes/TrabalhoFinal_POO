@@ -3,47 +3,47 @@ package model;
 public class Equipamento implements ExibirDetalhes {
     private int id;
     private String descricao;
-    private double vlr_diaria;
-    private double vlr_mensal;
-    private int qtd_total;
-    private int qtd_disponivel;
+    private double vlrDiaria;
+    private double vlrMensal;
+    private int qtdTotal;
+    private int qtdDisponivel;
 
-    public Equipamento(String descricao, double vlr_diaria, double vlr_mensal, int qtd_total) {
+    public Equipamento(String descricao, double vlrDiaria, double vlrMensal, int qtdTotal) {
         this.descricao = descricao;
-        this.vlr_diaria = vlr_diaria;
-        this.vlr_mensal = vlr_mensal;
-        this.qtd_total = qtd_total;
+        this.vlrDiaria = vlrDiaria;
+        this.vlrMensal = vlrMensal;
+        this.qtdTotal = qtdTotal;
     }
 
-    public Equipamento(int id, String descricao, double vlr_diaria, double vlr_mensal, int qtd_total, int qtd_disponivel) {
+    public Equipamento(int id, String descricao, double vlrDiaria, double vlrMensal, int qtdTotal, int qtdDisponivel) {
         this.id = id;
         this.descricao = descricao;
-        this.vlr_diaria = vlr_diaria;
-        this.vlr_mensal = vlr_mensal;
-        this.qtd_total = qtd_total;
-        this.qtd_disponivel = qtd_disponivel;
+        this.vlrDiaria = vlrDiaria;
+        this.vlrMensal = vlrMensal;
+        this.qtdTotal = qtdTotal;
+        this.qtdDisponivel = qtdDisponivel;
     }
-    public int getId_equip() {
+    public int getIdEquip() {
         return id;
     }   
     public String getDescricao() {
         return descricao;
     }
-    public double getVlr_diaria() {
-        return vlr_diaria;
+    public double getVlrDiaria() {
+        return vlrDiaria;
     }
-    public double getVlr_mensal() {
-        return vlr_mensal;
+    public double getVlrMensal() {
+        return vlrMensal;
     }
-    public int getQtd_total() {
-        return qtd_total;
+    public int getQtdTotal() {
+        return qtdTotal;
     }
-    public int getQtd_disponivel() {
-        return qtd_disponivel;
+    public int getQtdDisponivel() {
+        return qtdDisponivel;
     }
     
     @Override
     public String exibirDetalhes() {
-        return "ID: " + id + "\nDescrição: " + descricao + "\nValor diário: " + vlr_diaria + "\nValor mensal: " + vlr_mensal + "\nQuantidade total: " + qtd_total + "\nQuantidade disponível: " + qtd_disponivel;
+        return "ID: " + id + "\nDescrição: " + descricao + "\nValor diário: " + vlrDiaria + "\nValor mensal: " + vlrMensal + "\nQuantidade total: " + qtdTotal + "\nQuantidade disponível: " + qtdDisponivel;
     }
 }

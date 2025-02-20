@@ -139,11 +139,11 @@ public class ContratoDAO {
         }
     }
 
-    public boolean verificarEquipamentoEmContratoAtivo (int id_equip) {
+    public boolean verificarEquipamentoEmContratoAtivo (int idEquip) {
         String sql = "SELECT COUNT(*) FROM contrato WHERE id_equip = ? AND status = 'A'";
         try (Connection conn = ConexaoDAO.getConnection();){
             PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, id_equip);
+            stmt.setInt(1, idEquip);
             ResultSet rs = stmt.executeQuery();   
             stmt.close();
             conn.close();

@@ -7,8 +7,8 @@ import model.Equipamento;
 public class EquipamentoController {
     private EquipamentoDAO equipamentoDAO = new EquipamentoDAO();
 
-    public String cadastrarEquipamento (String descricao, double vlr_diaria, double vlr_mensal, int qtd_total) {
-        Equipamento equipamento = new Equipamento(descricao, vlr_diaria, vlr_mensal, qtd_total);
+    public String cadastrarEquipamento (String descricao, double vlrDiaria, double vlrMensal, int qtdTotal) {
+        Equipamento equipamento = new Equipamento(descricao, vlrDiaria, vlrMensal, qtdTotal);
         return equipamentoDAO.cadastrarEquipamento(equipamento);
     }
 

@@ -22,10 +22,10 @@ public class TotalizacaoController {
         double total = 0;
         if (contrato.getTipo() == 1) {
             int mesesContratados = dataAtual.getMonthValue() - dataFim.getMonthValue();
-            total = equipamento.getVlr_mensal() * mesesContratados;
+            total = equipamento.getVlrMensal() * mesesContratados;
         } else {
             int diasContratados = dataAtual.getDayOfMonth() - dataFim.getDayOfMonth();
-            total = equipamento.getVlr_diaria() * diasContratados;
+            total = equipamento.getVlrDiaria() * diasContratados;
         }
         return total;
     }

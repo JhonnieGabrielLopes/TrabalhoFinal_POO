@@ -181,8 +181,8 @@ public class Aluguel {
             Iterator<Equipamento> iterator = equipamentos.iterator();
             while (iterator.hasNext()) {
                 Equipamento equipamento = iterator.next();
-                if (equipamento.getQtd_disponivel() != 0) {
-                    System.out.println("ID: "+equipamento.getId_equip());
+                if (equipamento.getQtdDisponivel() != 0) {
+                    System.out.println("ID: "+equipamento.getIdEquip());
                     System.out.println("ID: "+equipamento.getDescricao());
                     System.out.println("-------------------------------------------------");
                 }
@@ -209,8 +209,8 @@ public class Aluguel {
         Iterator<Equipamento> iterator = equipamentos.iterator();
         while (iterator.hasNext()) {
             Equipamento equipamento = iterator.next();
-            if (equipamento.getId_equip() == idEquip) {
-                if (equipamento.getQtd_disponivel() < qtdEquip) {
+            if (equipamento.getIdEquip() == idEquip) {
+                if (equipamento.getQtdDisponivel() < qtdEquip) {
                     System.out.println("Quantidade de equipamentos indisponível! Informe uma quantidade menor.");
                     return false;
                 }

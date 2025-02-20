@@ -14,9 +14,9 @@ public class EquipamentoDAO {
         try (Connection conn = ConexaoDAO.getConnection();){
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, equipamento.getDescricao());
-            stmt.setDouble(2, equipamento.getVlr_diaria());
-            stmt.setDouble(3, equipamento.getVlr_mensal());
-            stmt.setInt(4, equipamento.getQtd_total());
+            stmt.setDouble(2, equipamento.getVlrDiaria());
+            stmt.setDouble(3, equipamento.getVlrMensal());
+            stmt.setInt(4, equipamento.getQtdTotal());
             stmt.executeUpdate();
             stmt.close();
             conn.close();
@@ -78,11 +78,11 @@ public class EquipamentoDAO {
         }
     }
 
-    public Equipamento buscarEquipamento (int id_equip) {
+    public Equipamento buscarEquipamento (int idEquip) {
         String sql = "SELECT * FROM equipamento WHERE id_equip = ?";
         try (Connection conn = ConexaoDAO.getConnection();){
             PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, id_equip);
+            stmt.setInt(1, idEquip);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 return new Equipamento(rs.getString("descricao"), rs.getDouble("vlr_diaria"), rs.getDouble("vlr_mensal"), rs.getInt("qtd_total"));

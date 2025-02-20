@@ -4,8 +4,9 @@ import control.*;
 import dao.*;
 import model.*;
 
-import java.nio.channels.Pipe.SourceChannel;
+import java.util.ArrayList;
 import java.util.InputMismatchException;
+import java.util.Iterator;
 import java.util.Scanner;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -18,6 +19,7 @@ public class Aluguel {
         Scanner scanner = new Scanner(System.in);
         ClienteController clienteController = new ClienteController();
         EquipamentoController equipamentoController = new EquipamentoController();
+        ContratoController contratoController = new ContratoController();
         
         
         aluguel.menu();
@@ -27,7 +29,7 @@ public class Aluguel {
 
         switch (opcao) {
             case 1:
-                aluguel.realizarAluguel(scanner, null, equipamentoController);
+                aluguel.realizarAluguel(aluguel, scanner, contratoController, equipamentoController, clienteController);
                 break;
             case 2:
                 aluguel.cadastrarEquipamento(scanner, equipamentoController);
@@ -121,10 +123,41 @@ public class Aluguel {
         System.out.println(equipamentoController.deletarEquipamento(id));
     }
 
-    public void realizarAluguel(Scanner scanner, ContratoController contratoController, EquipamentoController equipamentoController){
+    public void listarEquipamentos(EquipamentoController equipamentoController) {
+        ArrayList<Equipamento> equipamentos = equipamentoController.listarEquipamentos();
+        if (equipamentos.isEmpty()) {
+            System.out.println("Nenhum equipamento cadastrado!");
+        } else {
+            Iterator<Equipamento> iterator = equipamentos.iterator();
+            while (iterator.hasNext()) {
+                Equipamento equipamento = iterator.next();
+                if (equipamento.getQtd_disponivel() != 0) {
+                    System.out.println("ID: "+equipamento.getId_equip());
+                    System.out.println("ID: "+equipamento.getDescricao());
+                    System.out.println("-------------------------------------------------");
+                }
+            }
+        }
+    }
+    public boolean verificarQuantidadeEquipamento(EquipamentoController equipamentoController, int idEquip, int qtdEquip) {
+        ArrayList<Equipamento> equipamentos = equipamentoController.listarEquipamentos();
+        Iterator<Equipamento> iterator = equipamentos.iterator();
+        while (iterator.hasNext()) {
+            Equipamento equipamento = iterator.next();
+            if (equipamento.getId_equip() == idEquip) {
+                if (equipamento.getQtd_disponivel() < qtdEquip) {
+                    System.out.println("Quantidade de equipamentos indisponível! Informe uma quantidade menor.");
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    public void realizarAluguel(Aluguel aluguel, Scanner scanner, ContratoController contratoController, EquipamentoController equipamentoController, ClienteController clienteController) {
         boolean control= true;
-        
+        boolean control2= true;
         System.out.println("...........:::::: REALIZAR ALUGUEL ::::::...........\n");
+        
 
         int tipo= 0;
         do {
@@ -143,34 +176,47 @@ public class Aluguel {
                 control= false;
             }
         } while (!control);
+        scanner.nextLine();
+        System.out.println("Digite o CPF do cliente: ");
+        String cpf = scanner.nextLine();
+        if (clienteController.verificarCPF(cpf) == null) {
+            System.out.print("Digite o nome do cliente: ");
+            String nome = scanner.nextLine();
+            System.out.print("Digite o telefone do cliente: ");
+            String telefone = scanner.nextLine();
+            System.out.print("Digite o endereço do cliente: ");
+            String endereco = scanner.nextLine();
+            System.out.println(clienteController.CadastrarCliente(nome, cpf, telefone, endereco));
+        }
 
-        //cliente(scanner, null);
-
-        equipamentoController.listarEquipamentos();
+        aluguel.listarEquipamentos(equipamentoController);
         System.out.print("Digite o ID do equipamento que deseja alugar: ");
         int idEquip = scanner.nextInt();
         
         int qtdEquip= 0;
         do {
-            System.out.print("Informe a Quantidade do equipamento que será alugada: ");
-            try {
-                qtdEquip= scanner.nextInt();
-                control= true;
-            } catch (InputMismatchException e) {
-                System.out.println("\nInforme um valor válido!\n");
-                scanner.next();
-                control= false;
-            }
-        } while (!control);
-
+            do {
+                System.out.print("Informe a Quantidade do equipamento que será alugada: ");
+                try {
+                    qtdEquip= scanner.nextInt();
+                    control= true;
+                } catch (InputMismatchException e) {
+                    System.out.println("\nInforme um valor válido!\n");
+                    scanner.nextLine();
+                    control= false;
+                }
+            } while (!control);
+            control2= aluguel.verificarQuantidadeEquipamento(equipamentoController, idEquip, qtdEquip);
+        }while(!control2);
+        scanner.nextLine();
         String dataConvert= "";
+        LocalDate dataFim= null; 
         do {
             System.out.println("Informe a Data de finalização do contrato(DIA-MêS-ANO): ");
-            scanner.nextLine();
-            dataConvert = scanner.nextLine().trim(); 
+            dataConvert = scanner.nextLine().trim();
             try {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-                LocalDate dataFim = LocalDate.parse(dataConvert, formatter);
+                dataFim = LocalDate.parse(dataConvert, formatter);
                 control= true;
             } catch (InputMismatchException e) {
                 System.out.println("\nInforme uma data válida!\n");
@@ -180,8 +226,9 @@ public class Aluguel {
         } while (!control);
 
         LocalDate dataAtual = LocalDate.now();
-
-        //System.out.println(contratoController.cadastrarContrato(tipo, idEquip, qtdEquip, dataAtual, dataConvert, dataConvert));
+        Cliente cliente = clienteController.verificarCPF(cpf);
+        int idCliente = cliente.getId();
+        System.out.println(contratoController.cadastrarContrato(tipo, idCliente, idEquip, qtdEquip, dataAtual, dataFim));
 
     }
 

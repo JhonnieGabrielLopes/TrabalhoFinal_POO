@@ -56,7 +56,7 @@ public class EquipamentoDAO {
             PreparedStatement stmt = conn.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                equipamentos.add(new Equipamento(rs.getString("descricao"), rs.getDouble("vlr_diaria"), rs.getDouble("vlr_mensal"), rs.getInt("qtd_total"), rs.getInt("qtd_disponivel")));
+                equipamentos.add(new Equipamento(rs.getInt("id_equip"), rs.getString("descricao"), rs.getDouble("vlr_diaria"), rs.getDouble("vlr_mensal"), rs.getInt("qtd_total"), rs.getInt("qtd_disponivel")));
             }
         } catch (SQLException e) {
             e.printStackTrace();

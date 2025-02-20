@@ -32,7 +32,7 @@ public class ClienteDAO {
             stmt.setString(1, cpf);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return new Cliente(rs.getString("nome"), rs.getString("cpf"), rs.getString("telefone"), rs.getString("endereco"));
+                return new Cliente(rs.getInt("id_cliente"), rs.getString("nome"), rs.getString("cpf"), rs.getString("telefone"), rs.getString("endereco"));
             }
             return null;
         } catch (SQLException e) {

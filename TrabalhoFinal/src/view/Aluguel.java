@@ -22,6 +22,7 @@ public class Aluguel {
         boolean control= true;
         boolean control2= true;
         do {
+            LimpaTela.limpar();
             aluguel.menu();
             do {
                 try {
@@ -96,14 +97,14 @@ public class Aluguel {
         System.out.println("========================================");
     }
 
-    public void cliente(Scanner scanner, ClienteController clienteController) {
+    public String cliente(Scanner scanner, ClienteController clienteController) {
         boolean control= true;
         String cpf;
         do {
-            System.out.println("Digite o CPF do cliente(SEM ESPAÇOS, TRAÇOS OU PONTOS): ");
+            System.out.println("\nDigite o CPF do cliente(SEM ESPAÇOS, TRAÇOS OU PONTOS): ");
             System.out.print(" > ");
             cpf = scanner.nextLine();
-            if (cpf.length()<14 || cpf.length()>14) {
+            if (cpf.length()<11 || cpf.length()>11) {
                 System.out.println("\nInforme um CPF válido!\n");
                 System.out.print("ENTER...");
                 scanner.nextLine();
@@ -123,6 +124,7 @@ public class Aluguel {
             String endereco = scanner.nextLine();
             System.out.println(clienteController.CadastrarCliente(nome, cpf, telefone, endereco));
         }
+        return cpf;
     }
 
     public void cadastrarEquipamento(Scanner scanner, EquipamentoController equipamentoController){
@@ -142,6 +144,7 @@ public class Aluguel {
     }
 
     public void alterarEquipamento(Scanner scanner, EquipamentoController equipamentoController, ContratoController contratoController){
+        LimpaTela.limpar();
         equipamentoController.listarEquipamentos();
         System.out.print("Digite o ID do equipamento que deseja alterar: ");
         int id = scanner.nextInt();
@@ -163,6 +166,7 @@ public class Aluguel {
     }
 
     public void deletarEquipamento(Scanner scanner, EquipamentoController equipamentoController, ContratoController contratoController) {
+        LimpaTela.limpar();
         equipamentoController.listarEquipamentos();
         System.out.print("Digite o ID do equipamento que deseja deletar: ");
         int id = scanner.nextInt();
@@ -191,9 +195,10 @@ public class Aluguel {
     }
 
     public void listarEquipamentos(EquipamentoController equipamentoController) {
+        LimpaTela.limpar();
         ArrayList<Equipamento> equipamentos = equipamentoController.listarEquipamentos();
         if (equipamentos.isEmpty()) {
-            System.out.println("Nenhum equipamento cadastrado!");
+            System.out.println("\nNenhum equipamento cadastrado!");
         } else {
             Iterator<Equipamento> iterator = equipamentos.iterator();
             while (iterator.hasNext()) {
@@ -220,42 +225,52 @@ public class Aluguel {
     }
 
     public void realizarAluguel(Aluguel aluguel, Scanner scanner, ContratoController contratoController, EquipamentoController equipamentoController, ClienteController clienteController) {
+        LimpaTela.limpar();
         boolean control= true;
         boolean control2= true;
-        System.out.println("...........:::::: REALIZAR ALUGUEL ::::::...........\n");
         int tipo= 0;
         do {
-            System.out.print("Qual o Tipo do Contrato? 1- Mensal 2- Diário ");
+            System.out.println("...........:::::: REALIZAR ALUGUEL ::::::...........\n");
+            System.out.println("Qual o Tipo do Contrato? 1- Mensal 2- Diário ");
             try {
+                System.out.print(" > ");
                 tipo= scanner.nextInt();
+                scanner.nextLine();
                 if (tipo == 1 || tipo == 2) {
                     control= true;
                 } else {
                     System.out.println("\nInforme 1 ou 2!\n");
+                    System.out.print("ENTER...");
+                    scanner.nextLine();
+                    LimpaTela.limpar();
                     control= false;
                 }
             } catch (InputMismatchException e) {
                 System.out.println("\nInforme um valor válido!\n");
-                scanner.next();
+                System.out.print("ENTER...");
+                scanner.nextLine();
+                LimpaTela.limpar();
                 control= false;
             }
         } while (!control);
-        scanner.nextLine();
-        System.out.println("Digite o CPF do cliente: ");
-        String cpf = scanner.nextLine();
-        if (clienteController.verificarCPF(cpf) == null) {
-            System.out.print("Digite o nome do cliente: ");
-            String nome = scanner.nextLine();
-            System.out.print("Digite o telefone do cliente: ");
-            String telefone = scanner.nextLine();
-            System.out.print("Digite o endereço do cliente: ");
-            String endereco = scanner.nextLine();
-            System.out.println(clienteController.CadastrarCliente(nome, cpf, telefone, endereco));
-        }
-        aluguel.listarEquipamentos(equipamentoController);
-        System.out.print("Digite o ID do equipamento que deseja alugar: ");
-        int idEquip = scanner.nextInt();
+        String cpf = aluguel.cliente(scanner, clienteController);
+        aluguel.listarEquipamentosEscolha(equipamentoController);
+        int idEquip= 0;
         int qtdEquip= 0;
+        do {
+            System.out.print("\nDigite o ID do equipamento que deseja alugar: ");
+            try {
+                idEquip = scanner.nextInt();
+                control= true;
+            } catch (InputMismatchException e) {
+                System.out.println("\nInforme um valor válido!\n");
+                System.out.print("ENTER...");
+                scanner.nextLine();
+                LimpaTela.limpar();
+                aluguel.listarEquipamentos(equipamentoController);
+                control= false;
+            }
+        } while (!control);
         do {
             do {
                 System.out.print("Informe a Quantidade do equipamento que será alugada: ");
@@ -264,7 +279,10 @@ public class Aluguel {
                     control= true;
                 } catch (InputMismatchException e) {
                     System.out.println("\nInforme um valor válido!\n");
+                    System.out.print("ENTER...");
                     scanner.nextLine();
+                    LimpaTela.limpar();
+                    aluguel.listarEquipamentos(equipamentoController);
                     control= false;
                 }
             } while (!control);
@@ -282,7 +300,9 @@ public class Aluguel {
                 control= true;
             } catch (InputMismatchException e) {
                 System.out.println("\nInforme uma data válida!\n");
-                scanner.next();
+                System.out.print("ENTER...");
+                scanner.nextLine();
+                LimpaTela.limpar();
                 control= false;
             }
         } while (!control);
@@ -293,6 +313,7 @@ public class Aluguel {
     }
 
     public void encerrarContrato(Aluguel aluguel, Scanner scanner, ContratoController contratoController, EquipamentoController equipamentoController, TotalizacaoController totalizacaoController) {
+        LimpaTela.limpar();
         boolean control= true;
         int opc= 0;
         String forma= "";
@@ -354,6 +375,7 @@ public class Aluguel {
     }
 
     public void listarContratosAtivos(ContratoController contratoController, boolean dataHoje, LocalDate dataAtual) {
+        LimpaTela.limpar();
         ArrayList<Contrato> contratos = contratoController.listarContratoAtivo();
         if (contratos.isEmpty()) {
             System.out.println("Nenhum contrato Ativo!");
@@ -376,6 +398,7 @@ public class Aluguel {
     }
 
     public void listarContratosEncerrados(ContratoController contratoController) {
+        LimpaTela.limpar();
         ArrayList<Contrato> contratos = contratoController.listarContratoEncerrado();
         if (contratos.isEmpty()) {
             System.out.println("Nenhum contrato encerrado!");
@@ -390,6 +413,7 @@ public class Aluguel {
     }
 
     public void listarContratos(ContratoController contratoController) {
+        LimpaTela.limpar();
         ArrayList<Contrato> contratos = contratoController.listarContrato();
         if (contratos.isEmpty()) {
             System.out.println("Nenhum contrato cadastrado!");

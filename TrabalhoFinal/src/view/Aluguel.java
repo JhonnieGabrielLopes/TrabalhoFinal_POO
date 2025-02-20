@@ -2,8 +2,7 @@ package view;
 
 import control.*;
 import dao.*;
-import model.*;
-
+import model.*; 
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Iterator;
@@ -11,6 +10,7 @@ import java.util.Scanner;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+
 
 public class Aluguel {
     public static void main(String[] args) throws Exception {

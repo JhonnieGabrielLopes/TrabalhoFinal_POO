@@ -8,9 +8,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-import model.Cliente;
 import model.Contrato;
-import model.Equipamento;
 
 public class ContratoDAO {
     
@@ -19,8 +17,8 @@ public class ContratoDAO {
         try (Connection conn = ConexaoDAO.getConnection();){
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setInt(1, tipo);
-            stmt.setInt(2, idCliente); //ver como capturar o codigo do cliente
-            stmt.setInt(3, idEquip); //ver como capturar o código do equipamento
+            stmt.setInt(2, idCliente);
+            stmt.setInt(3, idEquip);
             stmt.setInt(4, qtdEquip);
             stmt.setDate(5, Date.valueOf(dataInicio));
             stmt.setDate(6, Date.valueOf(dataFim));
@@ -35,18 +33,94 @@ public class ContratoDAO {
         }
     }
 
-    public String listarContratoAtivo () {
-        String sql = "SELECT * FROM contrato WHERE status = 'A'";
+    public Contrato buscarContrato (int id) {
+        String sql = "SELECT * FROM contrato where id_contrato = ?";
         try (Connection conn = ConexaoDAO.getConnection();){
             PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return "rs.getInt(\"id_contrato\"), rs.getInt(\"tipo\"), rs.getInt(\"id_cliente\"), rs.getInt(\"id_equip\"), rs.getInt(\"qtd_equip\"), rs.getDate(\"data_inicio\").toLocalDate(), rs.getDate(\"data_fim\").toLocalDate(), rs.getDate(\"data_entrega\").toLocalDate(), rs.getString(\"status\")";
+                return new Contrato(rs.getInt("id_contrato"), rs.getInt("id_cliente"), 
+                rs.getString("nome"), rs.getInt("id_equip"), rs.getString("descricao"),
+                rs.getInt("tipo"), rs.getInt("qtd_equip"), rs.getString("data_inicio"),
+                rs.getString("data_fim"), rs.getString("data_entrega"), rs.getString("status"));
             }
             return null;
         } catch (SQLException e) {
+            e.printStackTrace();
             return null;
         }
+    }
+
+    public ArrayList<Contrato> listarContratoAtivo () {
+        ArrayList<Contrato> contratos = new ArrayList<>();
+        String sql = "SELECT c.id_contrato, c.tipo, c.id_cliente, cl.nome AS nome_cliente, " +
+                "c.id_equip, e.descricao AS descricao_equipamento, " +
+                 "c.qtd_equip, c.data_inicio, c.data_fim, c.data_entrega, c.status " +
+                 "FROM contrato c " +
+                 "JOIN cliente cl ON c.id_cliente = cl.id_cliente " +
+                 "JOIN equipamento e ON c.id_equip = e.id_equip " +
+                 "WHERE c.status = 'A'";
+        try (Connection conn = ConexaoDAO.getConnection();){
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                contratos.add(new Contrato(rs.getInt("id_contrato"), rs.getInt("id_cliente"), 
+                rs.getString("nome"), rs.getInt("id_equip"), rs.getString("descricao"), 
+                rs.getInt("tipo"), rs.getInt("qtd_equip"), rs.getString("data_inicio"), 
+                rs.getString("data_fim"), rs.getString("data_entrega"), rs.getString("status")));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return contratos;
+    }
+
+    public ArrayList<Contrato> listarContratoEncerrado () {
+        ArrayList<Contrato> contratos = new ArrayList<>();
+        String sql = "SELECT c.id_contrato, c.tipo, c.id_cliente, cl.nome AS nome_cliente, " +
+                "c.id_equip, e.descricao AS descricao_equipamento, " +
+                 "c.qtd_equip, c.data_inicio, c.data_fim, c.data_entrega, c.status " +
+                 "FROM contrato c " +
+                 "JOIN cliente cl ON c.id_cliente = cl.id_cliente " +
+                 "JOIN equipamento e ON c.id_equip = e.id_equip " +
+                 "WHERE c.status = 'F'";
+        try (Connection conn = ConexaoDAO.getConnection();){
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                contratos.add(new Contrato(rs.getInt("id_contrato"), rs.getInt("id_cliente"), 
+                rs.getString("nome"), rs.getInt("id_equip"), rs.getString("descricao"), 
+                rs.getInt("tipo"), rs.getInt("qtd_equip"), rs.getString("data_inicio"), 
+                rs.getString("data_fim"), rs.getString("data_entrega"), rs.getString("status")));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return contratos;
+    }
+
+    public ArrayList<Contrato> listarContrato () {
+        ArrayList<Contrato> contratos = new ArrayList<>();
+        String sql = "SELECT c.id_contrato, c.tipo, c.id_cliente, cl.nome AS nome_cliente, " +
+                "c.id_equip, e.descricao AS descricao_equipamento, " +
+                 "c.qtd_equip, c.data_inicio, c.data_fim, c.data_entrega, c.status " +
+                 "FROM contrato c " +
+                 "JOIN cliente cl ON c.id_cliente = cl.id_cliente " +
+                 "JOIN equipamento e ON c.id_equip = e.id_equip ";
+        try (Connection conn = ConexaoDAO.getConnection();){
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                contratos.add(new Contrato(rs.getInt("id_contrato"), rs.getInt("id_cliente"), 
+                rs.getString("nome"), rs.getInt("id_equip"), rs.getString("descricao"), 
+                rs.getInt("tipo"), rs.getInt("qtd_equip"), rs.getString("data_inicio"), 
+                rs.getString("data_fim"), rs.getString("data_entrega"), rs.getString("status")));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return contratos;
     }
 
     public String encerrarContrato (int id, String forma, LocalDate dataAtual) {
@@ -63,5 +137,22 @@ public class ContratoDAO {
         } catch (SQLException e) {
             return "Erro ao encerrar o Contrato";
         }
+    }
+
+    public boolean verificarEquipamentoEmContratoAtivo (int id_equip) {
+        String sql = "SELECT COUNT(*) FROM contrato WHERE id_equip = ? AND status = 'A'";
+        try (Connection conn = ConexaoDAO.getConnection();){
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, id_equip);
+            ResultSet rs = stmt.executeQuery();   
+            stmt.close();
+            conn.close();
+            if (rs.next() && rs.getInt(1) > 0) {
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } 
+        return false;
     }
 }

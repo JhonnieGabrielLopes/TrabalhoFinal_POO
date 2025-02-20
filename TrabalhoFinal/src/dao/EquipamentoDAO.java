@@ -78,4 +78,18 @@ public class EquipamentoDAO {
         }
     }
 
+    public Equipamento buscarEquipamento (int id_equip) {
+        String sql = "SELECT * FROM equipamento WHERE id_equip = ?";
+        try (Connection conn = ConexaoDAO.getConnection();){
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, id_equip);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new Equipamento(rs.getString("descricao"), rs.getDouble("vlr_diaria"), rs.getDouble("vlr_mensal"), rs.getInt("qtd_total"));
+            }
+            return null;
+        } catch (SQLException e) {
+            return null;
+        }
+    }
 }

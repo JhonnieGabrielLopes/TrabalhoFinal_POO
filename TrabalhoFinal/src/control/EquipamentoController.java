@@ -24,4 +24,7 @@ public class EquipamentoController {
         return equipamentoDAO.deletarEquipamento(id);
     }
 
+    public Equipamento buscarEquipamento (int id) {
+        return equipamentoDAO.buscarEquipamento(id);
+    }
 }

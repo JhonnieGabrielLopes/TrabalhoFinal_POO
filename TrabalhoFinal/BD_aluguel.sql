@@ -106,6 +106,7 @@ EXECUTE FUNCTION ajustar_qtd_disponivel();
 CREATE TABLE totalizacao (
 	id_tot SERIAL PRIMARY KEY,
 	id_contrato INT NOT NULL UNIQUE,
+    valor DOUBLE PRECISION NOT NULL,
 	multa DOUBLE PRECISION,
 	juros DOUBLE PRECISION,
 	vlr_total DOUBLE PRECISION NOT NULL,

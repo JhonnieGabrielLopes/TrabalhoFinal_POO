@@ -1,37 +1,75 @@
 package model;
 
-public class Contrato {
+public class Contrato implements ExibirDetalhes{
+    private int id;
+    private int idCliente;
+    private int idEquip;
+    private String nomeCliente;
+    private String DescEquipamento;
     private int tipo;
-    private int qtd_equip;
-    private String data_inicio;
-    private String data_fim;
-    private String data_entrega;
+    private int qtdEquip;
+    private String dataInicio;
+    private String dataFim;
+    private String dataEntrega;
     private String status;
 
-    public Contrato(int tipo, int qtd_equip, String data_inicio, String data_fim, String data_entrega, String status) {
+    public Contrato(int tipo, int qtdEquip, String dataInicio, String dataFim, String dataEntrega, String status) {
         this.tipo = tipo;
-        this.qtd_equip = qtd_equip;
-        this.data_inicio = data_inicio;
-        this.data_fim = data_fim;
-        this.data_entrega = data_entrega;
+        this.qtdEquip = qtdEquip;
+        this.dataInicio = dataInicio;
+        this.dataFim = dataFim;
+        this.dataEntrega = dataEntrega;
         this.status = status;
     }
+    public Contrato(int id, int idCliente, String nomeCliente, int idEquip, String DescEquipamento, int tipo, int qtdEquip, String dataInicio, String dataFim, String dataEntrega, String status) {
+        this.id = id;
+        this.idCliente = idCliente;
+        this.nomeCliente = nomeCliente;
+        this.idEquip = idEquip;
+        this.DescEquipamento = DescEquipamento;
+        this.tipo = tipo;
+        this.qtdEquip = qtdEquip;
+        this.dataInicio = dataInicio;
+        this.dataFim = dataFim;
+        this.dataEntrega = dataEntrega;
+        this.status = status;
+    }
+
     public int getTipo() {
         return tipo;
     }
-    public int getQtd_equip() {
-        return qtd_equip;
+    public int getQtdEquip() {
+        return qtdEquip;
     }
-    public String getData_inicio() {
-        return data_inicio;
+    public String getDataInicio() {
+        return dataInicio;
     }
-    public String getData_fim() {
-        return data_fim;
+    public String getDataFim() {
+        return dataFim;
     }
-    public String getData_entrega() {
-        return data_entrega;
+    public String getDataEntrega() {
+        return dataEntrega;
     }
     public String getStatus() {
         return status;
+    }
+    public int getId() {
+        return id;
+    }
+    public int getIdCliente() {
+        return idCliente;
+    }
+    public int getIdEquip() {
+        return idEquip;
+    }
+    public String getNomeCliente() {
+        return nomeCliente;
+    }
+    public String getDescEquipamento() {
+        return DescEquipamento;
+    }
+
+    public String exibirDetalhes() {
+        return "ID de Contrato: " + id + "\nID Cliente: " + idCliente + "   Nome Cliente: " + nomeCliente + "\nID Equipamento: " + idEquip + "  Descrição Equipamento: " + DescEquipamento + "\nTipo: " + tipo + "\nQuantidade de Equipamentos: " + qtdEquip + "\nData de Início: " + dataInicio + "\nData de Fim: " + dataFim + "\nData de Entrega: " + dataEntrega + "\nStatus do contrato: " + status;
     }
 }

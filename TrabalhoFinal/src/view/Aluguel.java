@@ -32,16 +32,16 @@ public class Aluguel {
                 aluguel.realizarAluguel(aluguel, scanner, contratoController, equipamentoController, clienteController);
                 break;
             case 2:
-                aluguel.cadastrarEquipamento(scanner, equipamentoController);
+                
                 break;
             case 3: 
-                aluguel.alterarEquipamento(scanner, equipamentoController);
+                aluguel.cadastrarEquipamento(scanner, equipamentoController);
                 break;
             case 4:
-                System.out.println(equipamentoController.listarEquipamentos());
+                aluguel.alterarEquipamento(scanner, equipamentoController);
                 break;
             case 5:
-                
+                System.out.println(equipamentoController.listarEquipamentos());
                 break;
             case 6: 
                 
@@ -61,13 +61,14 @@ public class Aluguel {
 
     public void menu(){
         System.out.println("1 - Registrar Contrato");
-        System.out.println("2 - Contratos Ativos");
-        System.out.println("3 - Contratos Encerrados");
-        System.out.println("4 - Todos os Contratos");
-        System.out.println("5 - Cadastrar Equipamento");
-        System.out.println("6 - Alterar Equipamento");
-        System.out.println("7 - Equipamentos Registrados");
-        System.out.println("8 - Deletar Equipamento");
+        System.out.println("2 - Encerrar Contrato");
+        System.out.println("3 - Contratos Ativos");
+        System.out.println("4 - Contratos Encerrados");
+        System.out.println("5 - Todos os Contratos");
+        System.out.println("6 - Cadastrar Equipamento");
+        System.out.println("7 - Alterar Equipamento");
+        System.out.println("8 - Equipamentos Registrados");
+        System.out.println("9 - Deletar Equipamento");
         System.out.println("0 - Sair");
     }
 
@@ -230,6 +231,63 @@ public class Aluguel {
         int idCliente = cliente.getId();
         System.out.println(contratoController.cadastrarContrato(tipo, idCliente, idEquip, qtdEquip, dataAtual, dataFim));
 
+    }
+
+    public void encerrarContrato(Aluguel aluguel, Scanner scanner, ContratoController contratoController) {
+        boolean control= true;
+        int opc= 0;
+        String forma= "";
+        do {
+            System.out.print("Como deseja encerrar o contrato? 1- Finalizar 2- Cancelar ");
+            try {
+                opc= scanner.nextInt();
+                if (opc == 1 || opc == 2) {
+                    control= true;
+                } else {
+                    System.out.println("\nInforme 1 ou 2!\n");
+                    control= false;
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("\nInforme um valor válido!\n");
+                scanner.next();
+                control= false;
+            }
+        } while (!control);
+
+        if (opc==1) {
+            forma= "F";
+            //listar todos os contratos ativos que possuem a data_fim igual à hoje
+        } else {
+            forma= "C";
+            //listar todos os contratos ativos
+        }
+
+        System.out.print("Informe o ID do Contrato que deseja encerrar: ");
+        int id= scanner.nextInt();
+
+        LocalDate dataAtual = LocalDate.now();
+        System.out.println(contratoController.encerrarContrato(id, forma, dataAtual));
+
+        //consultar o contrato selecionado e capturar o seu tipo
+            //se tipo contrato 1: consultar o equipamento do contrato selecionado e capturar o campo vlr_mensal
+            //se tipo contrato 2: consultar o equipamento do contrato selecionado e capturar o campo vlr_diaria
+
+        //consultar o contrato selecionado e capturar a data_fim
+            //se tipo contrato 1: calcular os meses contratados (dataAtual-dataFim) e vlrTotal = vlrMensal*qtdMeses
+            //se tipo contrato 2: calcular os dias contratados (dataAtual-dataFim) e vlrTotal = vlrDiaria*qtdDias
+            System.out.println(totalizacaoController.calcularTotal());
+            //se data_fim < dataAtual
+                //se tipo contrato 1: multa = vlrTotal*0.20 / vlrTotal = vlrTotal+multa
+                //se tipo contrato 2: multa = vlrTotal*0.50 / vlrTotal = vlrTotal+multa
+                System.out.println(totalizacaoController.calcularMulta());
+            //se data_fim > dataAtual
+                //calular os diasAtrasados (dataAtual-dataFim)
+                //se tipo contrato 1: multa = vlrTotal*0.50 / vlrTotal = vlrTotal+multa / juros = (vlrTotal+(diasAtrasados*0.10))
+                //se tipo contrato 2: multa = vlrTotal*0.70 / vlrTotal = vlrTotal+multa / juros = (vlrTotal+(diasAtrasados*0.20))
+                System.out.println(totalizacaoController.calcularJuros());
+
+
+        System.out.println(totalizacaoController.realizarTotalizacao());
     }
 
 }

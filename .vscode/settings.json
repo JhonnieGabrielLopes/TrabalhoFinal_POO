@@ -1,8 +1,6 @@
 {
-    "java.project.sourcePaths": [
-        "TrabalhoFinal\\src"
-    ],
+    "java.project.sourcePaths": [],
     "java.project.referencedLibraries": [
-        "TrabalhoFinal\\lib\\postgresql-42.7.5.jar"
+        "/home/luizotavio/Documentos/IFTM/faculdade/POO/trabalhofinal_jhonnie/TrabalhoFinal_POO/TrabalhoFinal/lib/postgresql-42.7.5.jar"
     ]
 }

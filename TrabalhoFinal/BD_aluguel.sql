@@ -68,6 +68,7 @@ EXECUTE FUNCTION atualizar_qtd_disponivel();
 -- Trigger para auto-atualizar a quantidade disponivel do equipamento após finalizar o aluguel
 CREATE OR REPLACE FUNCTION devolver_qtd_disponivel()
 RETURNS TRIGGER AS $$
+BEGIN
     UPDATE equipamento
     SET qtd_disponivel = qtd_disponivel + OLD.qtd_equip
     WHERE id_equip = OLD.id_equip;

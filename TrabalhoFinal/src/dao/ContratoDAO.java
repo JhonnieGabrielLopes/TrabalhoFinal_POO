@@ -48,4 +48,20 @@ public class ContratoDAO {
             return null;
         }
     }
+
+    public String encerrarContrato (int id, String forma, LocalDate dataAtual) {
+        String sql = "UPDATE contrato SET data_entrega = ?, status = ? WHERE id_contrato = ?";
+        try (Connection conn = ConexaoDAO.getConnection();){
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setDate(1, Date.valueOf(dataAtual));
+            stmt.setString(2, forma);
+            stmt.setInt(3, id);
+            stmt.executeUpdate();   
+            stmt.close();
+            conn.close();
+            return "Contrato encerrado com sucesso!";
+        } catch (SQLException e) {
+            return "Erro ao encerrar o Contrato";
+        }
+    }
 }

@@ -155,4 +155,21 @@ public class ContratoDAO {
         } 
         return false;
     }
+
+    public boolean verificarClienteEmContratoAtivo (String cpf) {
+        String sql = "SELECT COUNT(*) FROM contrato WHERE id_cliente = ? AND status = 'A'";
+        try (Connection conn = ConexaoDAO.getConnection();){
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, cpf);
+            ResultSet rs = stmt.executeQuery();   
+            stmt.close();
+            conn.close();
+            if (rs.next() && rs.getInt(1) > 0) {
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } 
+        return false;
+    }
 }

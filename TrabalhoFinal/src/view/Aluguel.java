@@ -66,6 +66,9 @@ public class Aluguel {
                 case 9:
                     aluguel.deletarEquipamento(scanner, equipamentoController, contratoController);
                     break;
+                case 10:
+                    aluguel.deletarCliente(contratoController, clienteController, scanner);
+                    break;
                 case 0:
                     System.out.println("\nSaindo...");
                     control2= false;
@@ -93,6 +96,7 @@ public class Aluguel {
         System.out.println("     [7] - Alterar Equipamento");
         System.out.println("     [8] - Equipamentos Registrados");
         System.out.println("     [9] - Deletar Equipamento");
+        System.out.println("     [10] - Deletar Cliente");
         System.out.println("     [0] - Sair");
         System.out.println("========================================");
     }
@@ -424,6 +428,29 @@ public class Aluguel {
                     System.out.println(contrato.exibirDetalhes());
                     System.out.println("-------------------------------------------------");
             }
+        }
+    }
+
+    public void deletarCliente (ContratoController contratoController, ClienteController clienteController, Scanner scanner) {
+        LimpaTela.limpar();
+        boolean control= true;
+        String cpf;
+        do {
+            System.out.println("\nDigite o CPF do cliente para remoção (SEM ESPAÇOS, TRAÇOS OU PONTOS): ");
+            System.out.print(" > ");
+            cpf = scanner.nextLine();
+            if (cpf.length()<11 || cpf.length()>11) {
+                System.out.println("\nInforme um CPF válido!\n");
+                System.out.print("ENTER...");
+                scanner.nextLine();
+                LimpaTela.limpar();
+                control= false;
+            }
+        } while (!control);
+        if (contratoController.verificarClienteEmContratoAtivo(cpf)) {
+            System.out.println("Cliente com contrato ativo! Não é possível remové-lo.");
+        }else{
+            System.out.println("\n"+clienteController.deletarCliente(cpf));        
         }
     }
 }

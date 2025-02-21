@@ -16,8 +16,8 @@ public class EquipamentoController {
         return equipamentoDAO.listarEquipamentos();
     }
 
-    public String alterarEquipamento (int id, int campo, String novoValor) {
-        return equipamentoDAO.alterarEquipamento(id, campo, novoValor);
+    public String alterarEquipamento (int id, int campo, String coluna, String novoValor) {
+        return equipamentoDAO.alterarEquipamento(id, campo, coluna, novoValor);
     }
 
     public String deletarEquipamento (int id) {

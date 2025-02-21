@@ -20,7 +20,7 @@ public class Aluguel {
         TotalizacaoController totalizacaoController = new TotalizacaoController();
         int opcao=0;
         boolean control= true;
-        boolean control2= true;
+        boolean control2= false;
         do {
             LimpaTela.limpar();
             aluguel.menu();
@@ -44,41 +44,53 @@ public class Aluguel {
                     break;
                 case 2:
                     aluguel.encerrarContrato(aluguel, scanner, contratoController, equipamentoController, totalizacaoController);
+                    System.out.print("ENTER...");
+                    scanner.nextLine();
                     break;
                 case 3: 
-                    aluguel.listarContratosAtivos(contratoController, false, null);
+                    aluguel.listarContratosAtivos(scanner, contratoController, false, null);
+                    System.out.print("ENTER...");
+                    scanner.nextLine();
                     break;
                 case 4:
                     aluguel.listarContratosEncerrados(contratoController);
+                    System.out.print("ENTER...");
+                    scanner.nextLine();
                     break;
                 case 5:
                     aluguel.listarContratos(contratoController);
+                    System.out.print("ENTER...");
+                    scanner.nextLine();
                     break;
                 case 6: 
                     aluguel.cadastrarEquipamento(scanner, equipamentoController);
                     break;  
                 case 7: 
-                    aluguel.alterarEquipamento(scanner, equipamentoController, contratoController);
+                    aluguel.alterarEquipamento(aluguel, scanner, equipamentoController, contratoController);
+                    System.out.print("ENTER...");
+                    scanner.nextLine();
                     break;
                 case 8:
                     aluguel.listarEquipamentos(equipamentoController);
+                    System.out.print("ENTER...");
+                    scanner.nextLine();
                     break;
                 case 9:
-                    aluguel.deletarEquipamento(scanner, equipamentoController, contratoController);
+                    aluguel.deletarEquipamento(aluguel, scanner, equipamentoController, contratoController); // erro ao deletar qualquer equipamento com registro em um contrato independente do STATUS
                     break;
                 case 10:
-                    aluguel.deletarCliente(contratoController, clienteController, scanner);
+                    aluguel.deletarCliente(contratoController, clienteController, scanner); // erro ao deletar qualquer cliente com registro em um contrato independente do STATUS
                     break;
                 case 0:
                     System.out.println("\nSaindo...");
-                    control2= false;
+                    control2= true;
                     break;
                 default:
                     System.out.println("\nOpção inválida!\n");
                     System.out.print("ENTER...");
                     scanner.nextLine();
                     LimpaTela.limpar();
-                    control2= false;
+                    control2= true;
                     break;
             }
         } while (!control2);
@@ -117,7 +129,8 @@ public class Aluguel {
             }
         } while (!control);
         if (clienteController.verificarCPF(cpf) == null) {
-            System.out.println("Digite o nome do cliente: ");
+            System.out.println("CPF não cadastrado! Vamos fazer um novo cadastro");
+            System.out.println("\nDigite o nome do cliente: ");
             System.out.print(" > ");
             String nome = scanner.nextLine();
             System.out.println("Digite o telefone do cliente: ");
@@ -126,8 +139,13 @@ public class Aluguel {
             System.out.println("Digite o endereço do cliente: ");
             System.out.print(" > ");
             String endereco = scanner.nextLine();
-            System.out.println(clienteController.CadastrarCliente(nome, cpf, telefone, endereco));
+            System.out.println("\n"+clienteController.CadastrarCliente(nome, cpf, telefone, endereco));
+        } else {
+            System.out.println("\nCPF já cadastrado!\n");
         }
+        System.out.print("Enter para prosseguir...");
+        scanner.nextLine();
+        LimpaTela.limpar();
         return cpf;
     }
 
@@ -147,11 +165,14 @@ public class Aluguel {
         System.out.println(equipamentoController.cadastrarEquipamento(descricao, vlrDiaria, vlrMensal, qtdTotal));
     }
 
-    public void alterarEquipamento(Scanner scanner, EquipamentoController equipamentoController, ContratoController contratoController){
+    public void alterarEquipamento(Aluguel aluguel, Scanner scanner, EquipamentoController equipamentoController, ContratoController contratoController){
         LimpaTela.limpar();
-        equipamentoController.listarEquipamentos();
+        aluguel.listarEquipamentos(equipamentoController);
         System.out.print("Digite o ID do equipamento que deseja alterar: ");
         int id = scanner.nextInt();
+        boolean control = true;
+        String coluna= "";
+        int campo;
         if (contratoController.verificarEquipamentoEmContratoAtivo(id)) {
             System.out.println("Equipamento em contrato ativo! Não é possível realizar alteração.");   
         }else{
@@ -160,38 +181,64 @@ public class Aluguel {
             System.out.println("2 - Valor Diário");
             System.out.println("3 - Valor Mensal");
             System.out.println("4 - Quantidade Total");
-            System.out.print("Escolha o campo que deseja alterar: ");
-            int campo = scanner.nextInt();
-            scanner.nextLine();
-            System.out.print("\nDigite o novo valor para: ");
+            do {
+                System.out.print("Escolha o campo que deseja alterar: ");
+                campo = scanner.nextInt();
+                scanner.nextLine();
+                
+                switch (campo) {
+                    case 1:
+                        coluna= "descricao"; 
+                        break;
+                    case 2:
+                        coluna= "vlr_diaria"; 
+                        break;
+                    case 3:
+                        coluna= "vlr_mensal"; 
+                        break;
+                    case 4:
+                        coluna= "qtd_total"; 
+                        break;
+                    default:
+                        System.out.println("Campo inválido!");
+                        control = false;
+                        break;
+                }
+            } while (!control);
+            System.out.print("\nDigite o novo valor de "+coluna+": ");
             String valor = scanner.nextLine();
-            System.out.println(equipamentoController.alterarEquipamento(id, campo, valor));
+            System.out.println(equipamentoController.alterarEquipamento(id, campo, coluna, valor));
         }
     }
 
-    public void deletarEquipamento(Scanner scanner, EquipamentoController equipamentoController, ContratoController contratoController) {
+    public void deletarEquipamento(Aluguel aluguel, Scanner scanner, EquipamentoController equipamentoController, ContratoController contratoController) {
         LimpaTela.limpar();
-        equipamentoController.listarEquipamentos();
+        aluguel.listarEquipamentos(equipamentoController);
         System.out.print("Digite o ID do equipamento que deseja deletar: ");
         int id = scanner.nextInt();
+        scanner.nextLine();
         if (contratoController.verificarEquipamentoEmContratoAtivo(id)) {
-            System.out.println("Equipamento em contrato ativo! Não é possível realizar a remoção.");   
+            System.out.println("\nEquipamento em contrato ativo! Não é possível realizar a remoção.");   
+            System.out.print("ENTER...");
+            scanner.nextLine();
         }else {
             System.out.println(equipamentoController.deletarEquipamento(id));
+            System.out.print("ENTER...");
+            scanner.nextLine();
         }
     }
 
     public void listarEquipamentosEscolha(EquipamentoController equipamentoController) {
         ArrayList<Equipamento> equipamentos = equipamentoController.listarEquipamentos();
         if (equipamentos.isEmpty()) {
-            System.out.println("Nenhum equipamento cadastrado!");
+            System.out.println("\nNenhum equipamento cadastrado!");
         } else {
             Iterator<Equipamento> iterator = equipamentos.iterator();
             while (iterator.hasNext()) {
                 Equipamento equipamento = iterator.next();
                 if (equipamento.getQtdDisponivel() != 0) {
                     System.out.println("ID: "+equipamento.getIdEquip());
-                    System.out.println("ID: "+equipamento.getDescricao());
+                    System.out.println("DESCRIÇÃO: "+equipamento.getDescricao());
                     System.out.println("-------------------------------------------------");
                 }
             }
@@ -277,7 +324,7 @@ public class Aluguel {
         } while (!control);
         do {
             do {
-                System.out.print("Informe a Quantidade do equipamento que será alugada: ");
+                System.out.print("\nInforme a Quantidade do equipamento que será alugada: ");
                 try {
                     qtdEquip= scanner.nextInt();
                     control= true;
@@ -296,7 +343,7 @@ public class Aluguel {
         String dataConvert= "";
         LocalDate dataFim= null; 
         do {
-            System.out.println("Informe a Data de finalização do contrato(DIA-MêS-ANO): ");
+            System.out.println("\nInforme a Data de finalização do contrato(DIA-MêS-ANO): ");
             dataConvert = scanner.nextLine().trim();
             try {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
@@ -314,6 +361,8 @@ public class Aluguel {
         Cliente cliente = clienteController.verificarCPF(cpf);
         int idCliente = cliente.getId();
         System.out.println(contratoController.cadastrarContrato(tipo, idCliente, idEquip, qtdEquip, dataAtual, dataFim));
+        System.out.print("Enter para prosseguir...");
+        scanner.nextLine();
     }
 
     public void encerrarContrato(Aluguel aluguel, Scanner scanner, ContratoController contratoController, EquipamentoController equipamentoController, TotalizacaoController totalizacaoController) {
@@ -340,22 +389,29 @@ public class Aluguel {
         LocalDate dataAtual = LocalDate.now();
         if (opc==1) {
             forma= "F";
-            aluguel.listarContratosAtivos(contratoController, true, dataAtual);
+            if (aluguel.listarContratosAtivos(scanner, contratoController, true, dataAtual)) {
+                scanner.nextLine();
+                return;
+            }
         } else {
             forma= "C";
-            aluguel.listarContratosAtivos(contratoController, false, dataAtual);
+            if (aluguel.listarContratosAtivos(scanner, contratoController, false, dataAtual)) {
+                scanner.nextLine();
+                return;
+            }
         }
         System.out.print("Informe o ID do Contrato que deseja encerrar: ");
         int id= scanner.nextInt();
         System.out.println("\n"+contratoController.encerrarContrato(id, forma, dataAtual));
         Contrato contrato = contratoController.buscarContrato(id);
         Equipamento equipamento = equipamentoController.buscarEquipamento(contrato.getIdEquip());
-        LocalDate dataFim = LocalDate.parse(contrato.getDataFim());
+        LocalDate dataFim = LocalDate.parse(contrato.getDataFim().substring(0,10));
         double valor = totalizacaoController.calcularValor(equipamento, contrato, dataAtual, dataFim);
         double multa= 0;
         double juros= 0;
         double total= 0;
-        if (dataFim.isBefore(dataAtual) ) {
+        total= totalizacaoController.calcularTotal(valor, multa, juros); //-------erro para calcular total, mes de encerramento = mes de data atual não computa valores
+        if (dataFim.isBefore(dataAtual) ) {                              //-------verifiicar totalização dos demais casos
             long diasAtrasados = ChronoUnit.DAYS.between(dataFim, dataAtual);
             if (contrato.getTipo() == 1) {
                 multa= totalizacaoController.calcularMulta(valor, 0.20);
@@ -376,20 +432,23 @@ public class Aluguel {
         System.out.println(totalizacaoController.realizarTotalizacao(id, valor, multa, juros, total));
         Totalizacao totalizacao = totalizacaoController.buscarTotalizacao(id);
         System.out.println(totalizacao.exibirDetalhes());
+        scanner.nextLine();
+        System.out.print("Enter para prosseguir");
+        scanner.nextLine();
     }
 
-    public void listarContratosAtivos(ContratoController contratoController, boolean dataHoje, LocalDate dataAtual) {
+    public boolean listarContratosAtivos(Scanner scanner, ContratoController contratoController, boolean dataHoje, LocalDate dataAtual) {
         LimpaTela.limpar();
         ArrayList<Contrato> contratos = contratoController.listarContratoAtivo();
         if (contratos.isEmpty()) {
             System.out.println("Nenhum contrato Ativo!");
-            return;
+            return true;
         }
         boolean control3= false;
         Iterator<Contrato> iterator = contratos.iterator();
         while (iterator.hasNext()) {
             Contrato contrato = iterator.next();
-            if (dataHoje && !contrato.getDataFim().equals(dataAtual.toString())) {
+            if (dataHoje && !contrato.getDataFim().substring(0,10).equals(dataAtual.toString())) {
                 continue;
             }
             System.out.println(contrato.exibirDetalhes());
@@ -398,7 +457,9 @@ public class Aluguel {
         }
         if (dataHoje && !control3) {
             System.out.println("Nenhum contrato com data final para o dia de hoje!");
+            return true;
         }
+        return false;
     }
 
     public void listarContratosEncerrados(ContratoController contratoController) {
@@ -447,10 +508,13 @@ public class Aluguel {
                 control= false;
             }
         } while (!control);
-        if (contratoController.verificarClienteEmContratoAtivo(cpf)) {
+        Cliente cliente = clienteController.verificarCPF(cpf);
+        if (contratoController.verificarClienteEmContratoAtivo(cliente.getId())) {
             System.out.println("Cliente com contrato ativo! Não é possível remové-lo.");
         }else{
             System.out.println("\n"+clienteController.deletarCliente(cpf));        
         }
+        System.out.print("Enter para prosseguir");
+        scanner.nextLine();
     }
 }

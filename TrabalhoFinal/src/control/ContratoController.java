@@ -37,7 +37,7 @@ public class ContratoController {
         return contratoDAO.verificarEquipamentoEmContratoAtivo(idEquip);
     }
 
-    public boolean verificarClienteEmContratoAtivo (String cpf) {
-        return contratoDAO.verificarClienteEmContratoAtivo(cpf);
+    public boolean verificarClienteEmContratoAtivo (int id) {
+        return contratoDAO.verificarClienteEmContratoAtivo(id);
     }
 }

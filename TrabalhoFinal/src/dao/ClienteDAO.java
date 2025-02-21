@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import model.Cliente;
 
@@ -17,8 +18,6 @@ public class ClienteDAO {
             stmt.setString(3, cliente.getTelefone());
             stmt.setString(4, cliente.getEndereco());
             stmt.executeUpdate();
-            stmt.close();
-            conn.close();
             return "Cliente cadastrado com sucesso!";
         } catch (SQLException e) {
             return "Erro ao cadastrar cliente";
@@ -46,12 +45,10 @@ public class ClienteDAO {
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, cpf);
             stmt.executeUpdate();
-            stmt.close();
-            conn.close();
             return "Cliente deletado com sucesso!";
         } catch (SQLException e) {
+            e.printStackTrace();
             return "Erro ao deletar cliente";
         }
     }
-    
 }

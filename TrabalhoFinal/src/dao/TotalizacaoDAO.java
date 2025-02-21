@@ -19,8 +19,6 @@ public class TotalizacaoDAO {
             stmt.setDouble(4, juros);
             stmt.setDouble(5, total);
             stmt.executeUpdate();   
-            stmt.close();
-            conn.close();
             return "Totalização realizada com sucesso!";
         } catch (SQLException e) {
             return "Erro ao realizar a Totalização";
@@ -28,13 +26,13 @@ public class TotalizacaoDAO {
     }
 
     public Totalizacao buscarTotalizacao (int contrato) {
-        String sql = "SELECT * FROM totalizacao where id_totalizacao = ?";
+        String sql = "SELECT * FROM totalizacao where id_contrato = ?";
         try (Connection conn = ConexaoDAO.getConnection();){
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setInt(1, contrato);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return new Totalizacao(rs.getInt("id_totalizacao"), rs.getInt("id_contrato"), rs.getDouble("valor"), rs.getDouble("multa"), rs.getDouble("juros"), rs.getDouble("vlr_total"));
+                return new Totalizacao(rs.getInt("id_tot"), rs.getInt("id_contrato"), rs.getDouble("valor"), rs.getDouble("multa"), rs.getDouble("juros"), rs.getDouble("vlr_total"));
             }
             return null;
         } catch (SQLException e) {

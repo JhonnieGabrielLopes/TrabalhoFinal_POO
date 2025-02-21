@@ -22,6 +22,7 @@ public class TotalizacaoController {
         double total = 0;
         if (contrato.getTipo() == 1) {
             int mesesContratados = dataAtual.getMonthValue() - dataFim.getMonthValue();
+            System.out.println(mesesContratados);
             total = equipamento.getVlrMensal() * mesesContratados;
         } else {
             int diasContratados = dataAtual.getDayOfMonth() - dataFim.getDayOfMonth();

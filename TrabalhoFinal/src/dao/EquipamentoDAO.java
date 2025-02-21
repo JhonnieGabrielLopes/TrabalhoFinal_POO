@@ -10,7 +10,7 @@ import model.Equipamento;
 
 public class EquipamentoDAO {
     public String cadastrarEquipamento (Equipamento equipamento) {
-        String sql = "INSERT INTO equipamento (descricao, vlr_diaria, vlr_mensal, qtd_total, qtd_disponivel) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO equipamento (descricao, vlr_diaria, vlr_mensal, qtd_total) VALUES (?, ?, ?, ?)";
         try (Connection conn = ConexaoDAO.getConnection();){
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, equipamento.getDescricao());
@@ -18,16 +18,14 @@ public class EquipamentoDAO {
             stmt.setDouble(3, equipamento.getVlrMensal());
             stmt.setInt(4, equipamento.getQtdTotal());
             stmt.executeUpdate();
-            stmt.close();
-            conn.close();
             return "Equipamento cadastrado com sucesso!";
         } catch (SQLException e) {
             return "Erro ao cadastrar equipamento";
         }
     }
 
-    public String alterarEquipamento (int id, int campo, String novoValor) {
-        String sql = "UPDATE equipamento SET descricao = ? WHERE id = ?";
+    public String alterarEquipamento (int id, int campo, String coluna, String novoValor) {
+        String sql = "UPDATE equipamento SET " + coluna + " = ? WHERE id_equip = ?";
         try (Connection conn = ConexaoDAO.getConnection();){
             PreparedStatement stmt = conn.prepareStatement(sql);
             if (campo == 1) {
@@ -36,22 +34,19 @@ public class EquipamentoDAO {
                 stmt.setDouble(1, Double.parseDouble(novoValor));
             }else if (campo == 4) {
                 stmt.setInt(1, Integer.parseInt(novoValor));
-            }else {
-                return "Campo inválido!";
             }
             stmt.setInt(2, id);
             stmt.executeUpdate();
-            stmt.close();
-            conn.close();
             return "Equipamento alterado com sucesso!";
         } catch (SQLException e) {
+            e.printStackTrace();
             return "Erro ao alterar equipamento";
         }
     }
 
     public ArrayList<Equipamento> listarEquipamentos () {
         ArrayList<Equipamento> equipamentos = new ArrayList<>();
-        String sql = "SELECT * FROM equipamento";
+        String sql = "SELECT * FROM equipamento order by id_equip ASC";
         try (Connection conn = ConexaoDAO.getConnection();){
             PreparedStatement stmt = conn.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
@@ -70,10 +65,9 @@ public class EquipamentoDAO {
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setInt(1, id);
             stmt.executeUpdate();
-            stmt.close();
-            conn.close();
             return "Equipamento deletado com sucesso!";
         } catch (SQLException e) {
+            e.printStackTrace();
             return "Erro ao deletar equipamento";
         }
     }

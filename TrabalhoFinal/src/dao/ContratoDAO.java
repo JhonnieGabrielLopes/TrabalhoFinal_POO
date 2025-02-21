@@ -25,8 +25,6 @@ public class ContratoDAO {
             stmt.setNull(7, java.sql.Types.DATE);
             stmt.setString(8, "A");
             stmt.executeUpdate();   
-            stmt.close();
-            conn.close();
             return "Contrato realizado com sucesso!";
         } catch (SQLException e) {
             return "Erro ao cadastrar o Contrato";
@@ -34,15 +32,21 @@ public class ContratoDAO {
     }
 
     public Contrato buscarContrato (int id) {
-        String sql = "SELECT * FROM contrato where id_contrato = ?";
+        String sql = "SELECT c.id_contrato, c.tipo, c.id_cliente, cl.nome AS nome_cliente, " +
+                "c.id_equip, e.descricao AS descricao_equipamento, " +
+                 "c.qtd_equip, c.data_inicio, c.data_fim, c.data_entrega, c.status " +
+                 "FROM contrato c " +
+                 "JOIN cliente cl ON c.id_cliente = cl.id_cliente " +
+                 "JOIN equipamento e ON c.id_equip = e.id_equip " +
+                 "WHERE id_contrato = ?";
         try (Connection conn = ConexaoDAO.getConnection();){
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 return new Contrato(rs.getInt("id_contrato"), rs.getInt("id_cliente"), 
-                rs.getString("nome"), rs.getInt("id_equip"), rs.getString("descricao"),
-                rs.getInt("tipo"), rs.getInt("qtd_equip"), rs.getString("data_inicio"),
+                rs.getString("nome_cliente"), rs.getInt("id_equip"), rs.getString("descricao_equipamento"), 
+                rs.getInt("tipo"), rs.getInt("qtd_equip"), rs.getString("data_inicio"), 
                 rs.getString("data_fim"), rs.getString("data_entrega"), rs.getString("status"));
             }
             return null;
@@ -66,7 +70,7 @@ public class ContratoDAO {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 contratos.add(new Contrato(rs.getInt("id_contrato"), rs.getInt("id_cliente"), 
-                rs.getString("nome"), rs.getInt("id_equip"), rs.getString("descricao"), 
+                rs.getString("nome_cliente"), rs.getInt("id_equip"), rs.getString("descricao_equipamento"), 
                 rs.getInt("tipo"), rs.getInt("qtd_equip"), rs.getString("data_inicio"), 
                 rs.getString("data_fim"), rs.getString("data_entrega"), rs.getString("status")));
             }
@@ -90,7 +94,7 @@ public class ContratoDAO {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 contratos.add(new Contrato(rs.getInt("id_contrato"), rs.getInt("id_cliente"), 
-                rs.getString("nome"), rs.getInt("id_equip"), rs.getString("descricao"), 
+                rs.getString("nome_cliente"), rs.getInt("id_equip"), rs.getString("descricao_equipamento"), 
                 rs.getInt("tipo"), rs.getInt("qtd_equip"), rs.getString("data_inicio"), 
                 rs.getString("data_fim"), rs.getString("data_entrega"), rs.getString("status")));
             }
@@ -113,7 +117,7 @@ public class ContratoDAO {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 contratos.add(new Contrato(rs.getInt("id_contrato"), rs.getInt("id_cliente"), 
-                rs.getString("nome"), rs.getInt("id_equip"), rs.getString("descricao"), 
+                rs.getString("nome_cliente"), rs.getInt("id_equip"), rs.getString("descricao_equipamento"), 
                 rs.getInt("tipo"), rs.getInt("qtd_equip"), rs.getString("data_inicio"), 
                 rs.getString("data_fim"), rs.getString("data_entrega"), rs.getString("status")));
             }
@@ -131,8 +135,6 @@ public class ContratoDAO {
             stmt.setString(2, forma);
             stmt.setInt(3, id);
             stmt.executeUpdate();   
-            stmt.close();
-            conn.close();
             return "Contrato encerrado com sucesso!";
         } catch (SQLException e) {
             return "Erro ao encerrar o Contrato";
@@ -145,8 +147,6 @@ public class ContratoDAO {
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setInt(1, idEquip);
             ResultSet rs = stmt.executeQuery();   
-            stmt.close();
-            conn.close();
             if (rs.next() && rs.getInt(1) > 0) {
                 return true;
             }
@@ -156,14 +156,12 @@ public class ContratoDAO {
         return false;
     }
 
-    public boolean verificarClienteEmContratoAtivo (String cpf) {
+    public boolean verificarClienteEmContratoAtivo (int id) {
         String sql = "SELECT COUNT(*) FROM contrato WHERE id_cliente = ? AND status = 'A'";
         try (Connection conn = ConexaoDAO.getConnection();){
             PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setString(1, cpf);
+            stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();   
-            stmt.close();
-            conn.close();
             if (rs.next() && rs.getInt(1) > 0) {
                 return true;
             }

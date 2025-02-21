@@ -71,5 +71,6 @@ public class Contrato implements ExibirDetalhes{
 
     public String exibirDetalhes() {
         return "ID de Contrato: " + id + "\nID Cliente: " + idCliente + "   Nome Cliente: " + nomeCliente + "\nID Equipamento: " + idEquip + "  Descrição Equipamento: " + DescEquipamento + "\nTipo: " + tipo + "\nQuantidade de Equipamentos: " + qtdEquip + "\nData de Início: " + dataInicio + "\nData de Fim: " + dataFim + "\nData de Entrega: " + dataEntrega + "\nStatus do contrato: " + status;
+        //TRATAR A EXIBIÇÃO DOS DADOS, POR EXEMPLO, STATUS DO CONTRATO QUE MOSTRA 'A' E NAO 'ATIVO'
     }
 }

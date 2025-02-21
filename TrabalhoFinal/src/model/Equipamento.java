@@ -44,6 +44,6 @@ public class Equipamento implements ExibirDetalhes {
     
     @Override
     public String exibirDetalhes() {
-        return "ID: " + id + "\nDescrição: " + descricao + "\nValor diário: " + vlrDiaria + "\nValor mensal: " + vlrMensal + "\nQuantidade total: " + qtdTotal + "\nQuantidade disponível: " + qtdDisponivel;
+        return "ID: " + id + "\nDescrição: " + descricao + "\nValor diário: R$" + vlrDiaria + "\nValor mensal: R$" + vlrMensal + "\nQuantidade total: " + qtdTotal + "\nQuantidade disponível: " + qtdDisponivel;
     }
 }

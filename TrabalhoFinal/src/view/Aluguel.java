@@ -98,6 +98,7 @@ public class Aluguel {
     }
     //--------------------------------metodos---------------------------------------------------------------------
     public void menu(){
+        //criar menu apenas para contrato
         System.out.println("==================HOME==================");
         System.out.println("     [1] - Registrar Contrato");
         System.out.println("     [2] - Encerrar Contrato");
@@ -109,6 +110,7 @@ public class Aluguel {
         System.out.println("     [8] - Equipamentos Registrados");
         System.out.println("     [9] - Deletar Equipamento");
         System.out.println("     [10] - Deletar Cliente");
+        //colocar um listar clientes
         System.out.println("     [0] - Sair");
         System.out.println("========================================");
     }
@@ -161,6 +163,7 @@ public class Aluguel {
         double vlrMensal = scanner.nextDouble();
         System.out.println("Digite a quantidade total do equipamento: ");
         System.out.print(" > ");
+        //colocar um aivso de que foi cadastrado com sucesso
         int qtdTotal = scanner.nextInt();
         System.out.println(equipamentoController.cadastrarEquipamento(descricao, vlrDiaria, vlrMensal, qtdTotal));
     }
@@ -171,7 +174,7 @@ public class Aluguel {
         System.out.print("Digite o ID do equipamento que deseja alterar: ");
         int id = scanner.nextInt();
         boolean control = true;
-        String coluna= "";
+        String coluna= "", desc= "";
         int campo;
         if (contratoController.verificarEquipamentoEmContratoAtivo(id)) {
             System.out.println("Equipamento em contrato ativo! Não é possível realizar alteração.");   
@@ -188,16 +191,20 @@ public class Aluguel {
                 
                 switch (campo) {
                     case 1:
-                        coluna= "descricao"; 
+                        coluna= "descricao";
+                        desc= "Descrição";
                         break;
                     case 2:
                         coluna= "vlr_diaria"; 
+                        desc="Diária";
                         break;
                     case 3:
                         coluna= "vlr_mensal"; 
+                        desc="Mensalidade";
                         break;
                     case 4:
                         coluna= "qtd_total"; 
+                        desc="Quantidade";
                         break;
                     default:
                         System.out.println("Campo inválido!");
@@ -205,7 +212,7 @@ public class Aluguel {
                         break;
                 }
             } while (!control);
-            System.out.print("\nDigite o novo valor de "+coluna+": ");
+            System.out.print("\nDigite o novo valor de "+desc+": ");
             String valor = scanner.nextLine();
             System.out.println(equipamentoController.alterarEquipamento(id, campo, coluna, valor));
         }
@@ -343,7 +350,7 @@ public class Aluguel {
         String dataConvert= "";
         LocalDate dataFim= null; 
         do {
-            System.out.println("\nInforme a Data de finalização do contrato(DIA-MêS-ANO): ");
+            System.out.print("\nInforme a Data de finalização do contrato(DIA-MêS-ANO): ");
             dataConvert = scanner.nextLine().trim();
             try {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
@@ -429,11 +436,23 @@ public class Aluguel {
             }
             total= totalizacaoController.calcularTotal(valor, multa, juros);
         }
+        aluguel.exibirValores(scanner, valor, multa, juros, total);
         System.out.println(totalizacaoController.realizarTotalizacao(id, valor, multa, juros, total));
-        Totalizacao totalizacao = totalizacaoController.buscarTotalizacao(id);
-        System.out.println(totalizacao.exibirDetalhes());
+        //Totalizacao totalizacao = totalizacaoController.buscarTotalizacao(id);
+        //System.out.println(totalizacao.exibirDetalhes());
         scanner.nextLine();
         System.out.print("Enter para prosseguir");
+        scanner.nextLine();
+    }
+
+    public void exibirValores(Scanner scanner, double valor, double multa, double juros, double total) {
+        //DESCOBRIR POR QUE ESTA FICANDO NEGATIVO
+        System.out.println( "   Valor: R$" + valor + "\n" +
+                            "   Multa: R$" + multa + "\n" +
+                            "   Juros: R$" + juros + "\n" +
+                            "----------------------" + "\n" +
+                            "   Total: R$" + total);
+        System.out.print("\nEnter para prosseguir");
         scanner.nextLine();
     }
 

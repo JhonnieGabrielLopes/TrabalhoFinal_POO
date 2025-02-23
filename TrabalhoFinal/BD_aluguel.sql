@@ -40,9 +40,9 @@ CREATE TABLE contrato (
     id_cliente INT NOT NULL,
     id_equip INT NOT NULL,
 	qtd_equip INT NOT NULL,
-    data_inicio TIMESTAMP NOT NULL,
-    data_fim TIMESTAMP NOT NULL,
-    data_entrega TIMESTAMP,
+    data_inicio DATE NOT NULL,
+    data_fim DATE NOT NULL,
+    data_entrega DATE,
     status VARCHAR(1) NOT NULL DEFAULT 'A',
     FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente),
     FOREIGN KEY (id_equip) REFERENCES equipamento(id_equip)

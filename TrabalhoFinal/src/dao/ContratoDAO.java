@@ -25,9 +25,29 @@ public class ContratoDAO {
             stmt.setNull(7, java.sql.Types.DATE);
             stmt.setString(8, "A");
             stmt.executeUpdate();   
-            return "Contrato realizado com sucesso!";
+            return "Contrato realizado com sucesso!\n";
         } catch (SQLException e) {
-            return "Erro ao cadastrar o Contrato";
+            return "Erro ao cadastrar o Contrato\n";
+        }
+    }
+
+    public Contrato buscarUltimoContrato () {
+        String sql = "SELECT * " +
+                     "FROM contrato "+
+                     "ORDER BY id_contrato DESC " + 
+                     "LIMIT 1";
+        try (Connection conn = ConexaoDAO.getConnection();){
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new Contrato(rs.getInt("tipo"), rs.getInt("qtd_equip"), rs.getString("data_inicio"), 
+                rs.getString("data_fim"), rs.getString("data_entrega"), rs.getString("status"));
+            }
+            return null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Erro ao obter o Último Contrato Cadastrado");
+            return null;
         }
     }
 
@@ -88,7 +108,8 @@ public class ContratoDAO {
                  "FROM contrato c " +
                  "JOIN cliente cl ON c.id_cliente = cl.id_cliente " +
                  "JOIN equipamento e ON c.id_equip = e.id_equip " +
-                 "WHERE c.status = 'F'";
+                 "WHERE c.status = 'F' or c.status = 'C'" + 
+                 "ORDER BY c.id_contrato ASC";
         try (Connection conn = ConexaoDAO.getConnection();){
             PreparedStatement stmt = conn.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();

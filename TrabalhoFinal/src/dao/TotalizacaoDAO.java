@@ -19,7 +19,7 @@ public class TotalizacaoDAO {
             stmt.setDouble(4, juros);
             stmt.setDouble(5, total);
             stmt.executeUpdate();   
-            return "Totalização realizada com sucesso!";
+            return "Totalização realizada com sucesso!\n";
         } catch (SQLException e) {
             return "Erro ao realizar a Totalização";
         }

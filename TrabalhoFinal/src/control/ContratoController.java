@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import dao.ContratoDAO;
 import model.Contrato;
+import model.Equipamento;
 
 public class ContratoController {
     private ContratoDAO contratoDAO = new ContratoDAO();
@@ -40,4 +41,9 @@ public class ContratoController {
     public boolean verificarClienteEmContratoAtivo (int id) {
         return contratoDAO.verificarClienteEmContratoAtivo(id);
     }
+
+    public Contrato  ultimoContrato () {
+        return contratoDAO.buscarUltimoContrato();
+    }
+
 }

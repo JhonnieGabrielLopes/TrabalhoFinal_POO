@@ -1,6 +1,8 @@
 package control;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 import dao.TotalizacaoDAO;
 import model.Contrato;
@@ -18,29 +20,65 @@ public class TotalizacaoController {
         return totalizacaoDAO.buscarTotalizacao(contrato);
     }
     
-    public Double calcularValor (Equipamento equipamento, Contrato contrato, LocalDate dataAtual, LocalDate dataFim) {
+    public Double calcularValor (Equipamento equipamento, Contrato contrato, LocalDate dataAtual) {
         double total = 0;
-        if (contrato.getTipo() == 1) {
-            int mesesContratados = dataAtual.getMonthValue() - dataFim.getMonthValue();
-            System.out.println(mesesContratados);
-            total = equipamento.getVlrMensal() * mesesContratados;
+        LocalDate dataFim = LocalDate.parse(contrato.getDataFim().substring(0,10));
+
+        if (dataAtual.isAfter(dataFim)) {
+            if (contrato.getTipo() == 1) {
+                long mesesContratados = ChronoUnit.MONTHS.between(dataFim, dataAtual);
+                total = equipamento.getVlrMensal() * mesesContratados;
+                total *= contrato.getQtdEquip();
+            } else {
+                long diasContratados = ChronoUnit.DAYS.between(dataFim, dataAtual);
+                total = equipamento.getVlrDiaria() * diasContratados;
+                total *= contrato.getQtdEquip();
+            } 
+        } else if (dataAtual.isBefore(dataFim)) {
+            if (contrato.getTipo() == 1) {
+                long mesesContratados = ChronoUnit.MONTHS.between(dataAtual, dataFim);
+                total = equipamento.getVlrMensal() * mesesContratados;
+                total *= contrato.getQtdEquip();
+            } else {
+                long diasContratados = ChronoUnit.DAYS.between(dataAtual, dataFim);
+                total = equipamento.getVlrDiaria() * diasContratados;
+                total *= contrato.getQtdEquip();
+            }
         } else {
-            int diasContratados = dataAtual.getDayOfMonth() - dataFim.getDayOfMonth();
-            total = equipamento.getVlrDiaria() * diasContratados;
+            DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate dataContrato = LocalDate.parse(contrato.getDataInicio(), formato);
+            if (contrato.getTipo() == 1) {
+                long diasUtilizados = ChronoUnit.DAYS.between(dataContrato, dataAtual);
+                double vlrDiariaMes = equipamento.getVlrMensal()/30;
+                total = vlrDiariaMes * diasUtilizados;
+            } else {
+                long diasContratados = ChronoUnit.DAYS.between(dataContrato, dataAtual);
+                total = equipamento.getVlrDiaria() * diasContratados;
+            }
         }
+
         return total;
     }
 
-    public Double calcularMulta (double total, double acrescimo) {
-        double multa = 0;
-        multa=total*acrescimo;
-        return multa;
+    public Double calcularMulta (int forma, double valor) {
+        double total = 0;
+        if (forma == 1) {
+            total = valor*0.20; 
+        } else {
+            total = valor*0.50;
+        }
+        return total;
     }
                 
-    public Double calcularJuros (long diasAtraso, double acrescimo) {
-        double juros = 0;
-        juros = diasAtraso * acrescimo;
-        return juros;
+    public Double calcularJuros (int forma, double valor, LocalDate dataAtual, LocalDate dataFim) {
+        long diasAtrasados = ChronoUnit.DAYS.between(dataFim, dataAtual);
+        double total = 0;
+        if (forma==1) {
+            total = ((diasAtrasados*0.10)*valor);
+        } else {
+            total = ((diasAtrasados*0.20)*valor);
+        }
+        return total;
     }
 
     public Double calcularTotal (double total, double multa, double juros) {

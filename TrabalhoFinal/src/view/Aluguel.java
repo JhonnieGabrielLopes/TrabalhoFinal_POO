@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.Scanner;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 
 public class Aluguel {
     public static void main(String[] args) throws Exception {
@@ -76,7 +75,7 @@ public class Aluguel {
                     scanner.nextLine();
                     break;
                 case 9:
-                    aluguel.deletarEquipamento(aluguel, scanner, equipamentoController, contratoController); // erro ao deletar qualquer equipamento com registro em um contrato independente do STATUS
+                    aluguel.deletarEquipamento(aluguel, scanner, equipamentoController, contratoController);
                     break;
                 case 10:
                     aluguel.deletarCliente(contratoController, clienteController, scanner); // erro ao deletar qualquer cliente com registro em um contrato independente do STATUS
@@ -212,8 +211,28 @@ public class Aluguel {
                         break;
                 }
             } while (!control);
-            System.out.print("\nDigite o novo valor de "+desc+": ");
-            String valor = scanner.nextLine();
+            
+            String valor= null;
+            int valorTemp = 0;
+
+            if (!desc.equals("Descrição")) {
+                do {
+                    System.out.print("\nDigite o novo valor de "+desc+": ");
+                    try {
+                        valorTemp = scanner.nextInt();
+                        scanner.nextLine();
+                        control = true;
+                    } catch (InputMismatchException e) {
+                        System.out.println("\nInforme um valor válido!");
+                        scanner.next();
+                        control= false;
+                    }
+                } while (!control);
+                valor = String.valueOf(valorTemp);
+            } else {
+                System.out.print("\nDigite o novo valor de "+desc+": ");
+                valor = scanner.nextLine();
+            }
             System.out.println(equipamentoController.alterarEquipamento(id, campo, coluna, valor));
         }
     }
@@ -229,7 +248,15 @@ public class Aluguel {
             System.out.print("ENTER...");
             scanner.nextLine();
         }else {
-            System.out.println(equipamentoController.deletarEquipamento(id));
+            System.out.println("\nCRÍTICO - Tem certeza que deseja Excluir o equipamento? 1- Sim 2- Não\nProsseguindo com a exclusão não será possivel consultar os Contratos do equipamento posteriormente!!");
+            System.out.print(" > ");
+            int opc = scanner.nextInt();
+            scanner.nextLine();
+            if (opc == 2) {
+                System.out.println("Exclusão cancelada!!");
+            } else {
+                System.out.println(equipamentoController.deletarEquipamento(id));
+            }
             System.out.print("ENTER...");
             scanner.nextLine();
         }
@@ -372,7 +399,7 @@ public class Aluguel {
                         control= false;
                     } else {
                         int temp= tempo*30;
-                        dataFim = dataAtual.plusDays(temp); //Adiciona a quantidade de dias refente a quantidade de meses
+                        dataFim = dataAtual.plusDays(temp);
                         control= true;
                     }
                 } else {
@@ -507,23 +534,27 @@ public class Aluguel {
 
         while (iterator.hasNext()) {
             Contrato contrato = iterator.next();
-            LocalDate dataContrato = LocalDate.parse(contrato.getDataFim(), formato);
-            boolean finaliza = dataAtual.isAfter(dataContrato) || dataAtual.equals(dataContrato);
-            boolean cancela = dataAtual.isBefore(dataContrato) && !dataAtual.equals(dataContrato);
+
+            if (dataAtual != null) {
+                LocalDate dataContrato = LocalDate.parse(contrato.getDataFim(), formato);
+                boolean finaliza = dataAtual.isAfter(dataContrato) || dataAtual.equals(dataContrato);
+                boolean cancela = dataAtual.isBefore(dataContrato) && !dataAtual.equals(dataContrato);
             
-            if (forma == 1 && finaliza) {
-                System.out.println(contrato.exibirDetalhes() +
-                                   "\n--------------------------------------------------------------------");
-                qtdFin++;
-            } else if (forma == 2 && cancela) {
-                System.out.println(contrato.exibirDetalhes() +
-                                   "\n--------------------------------------------------------------------");
-                qtdCan++;
+                if (forma == 1 && finaliza) {
+                    System.out.println(contrato.exibirDetalhes()+"\n--------------------------------------------------------------------");
+                    qtdFin++;
+                } else if (forma == 2 && cancela) {
+                    System.out.println(contrato.exibirDetalhes()+"\n--------------------------------------------------------------------");
+                    qtdCan++;
+                }
+                
+            } else {
+                System.out.println(contrato.exibirDetalhes());
             }
-            
+
         }
 
-        if (qtdFin == 0 && qtdCan == 0) {
+        if (dataAtual != null && qtdFin == 0 && qtdCan == 0) {
             System.out.println("Não encontrado contratos para Finalização/Cancelamento");
             return true;
         }
@@ -581,7 +612,15 @@ public class Aluguel {
         if (contratoController.verificarClienteEmContratoAtivo(cliente.getId())) {
             System.out.println("Cliente com contrato ativo! Não é possível remové-lo.");
         }else{
-            System.out.println("\n"+clienteController.deletarCliente(cpf));        
+            System.out.println("\nCRÍTICO - Tem certeza que deseja Excluir o cliente? 1- Sim 2- Não\nProsseguindo com a exclusão não será possivel consultar os Contratos do cliente posteriormente!!");
+            System.out.print(" > ");
+            int opc = scanner.nextInt();
+            scanner.nextLine();
+            if (opc == 2) {
+                System.out.println("Exclusão cancelada!!");
+            } else {
+                System.out.println("\n"+clienteController.deletarCliente(cpf)); 
+            }  
         }
         System.out.print("Enter para prosseguir");
         scanner.nextLine();

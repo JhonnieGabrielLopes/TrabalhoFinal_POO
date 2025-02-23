@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 import dao.ContratoDAO;
 import model.Contrato;
-import model.Equipamento;
 
 public class ContratoController {
     private ContratoDAO contratoDAO = new ContratoDAO();

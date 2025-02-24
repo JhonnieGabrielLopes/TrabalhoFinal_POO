@@ -18,7 +18,7 @@ public class EquipamentoDAO {
             stmt.setDouble(3, equipamento.getVlrMensal());
             stmt.setInt(4, equipamento.getQtdTotal());
             stmt.executeUpdate();
-            return "Equipamento cadastrado com sucesso!";
+            return "\nEquipamento cadastrado com sucesso!";
         } catch (SQLException e) {
             return "Erro ao cadastrar equipamento";
         }
@@ -37,7 +37,7 @@ public class EquipamentoDAO {
             }
             stmt.setInt(2, id);
             stmt.executeUpdate();
-            return "Equipamento alterado com sucesso!";
+            return "\nEquipamento alterado com sucesso!";
         } catch (SQLException e) {
             e.printStackTrace();
             return "Erro ao alterar equipamento";
@@ -65,7 +65,7 @@ public class EquipamentoDAO {
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setInt(1, id);
             stmt.executeUpdate();
-            return "Equipamento deletado com sucesso!";
+            return "\nEquipamento deletado com sucesso!";
         } catch (SQLException e) {
             e.printStackTrace();
             return "Erro ao deletar equipamento";

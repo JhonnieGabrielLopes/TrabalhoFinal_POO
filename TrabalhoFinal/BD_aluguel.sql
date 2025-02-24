@@ -1,5 +1,7 @@
 CREATE DATABASE Aluguel;
 
+--Após criar o banco, acesse a Query Tool do mesmo e insira os comandos restante:
+
 -- Clientes
 CREATE TABLE cliente (
 	id_cliente SERIAL PRIMARY KEY,
@@ -37,15 +39,15 @@ EXECUTE FUNCTION preencher_qtd_disponivel();
 CREATE TABLE contrato (
     id_contrato SERIAL PRIMARY KEY,
 	tipo INT NOT NULL,
-    id_cliente INT NOT NULL,
-    id_equip INT NOT NULL,
+    id_cliente INT,
+    id_equip INT,
 	qtd_equip INT NOT NULL,
     data_inicio DATE NOT NULL,
     data_fim DATE NOT NULL,
     data_entrega DATE,
     status VARCHAR(1) NOT NULL DEFAULT 'A',
-    FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente),
-    FOREIGN KEY (id_equip) REFERENCES equipamento(id_equip)
+    FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente) ON DELETE SET NULL,
+    FOREIGN KEY (id_equip) REFERENCES equipamento(id_equip) ON DELETE SET NULL
 );
 
 -- Trigger para auto-atualizar a quantidade disponivel do equipamento após realizar o aluguel

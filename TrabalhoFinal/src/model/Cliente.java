@@ -22,4 +22,9 @@ public class Cliente extends Pessoa {
     public int getId() {
         return id;
     }
+
+    public String exibirDetalhes() {
+        return "ID do Cliente: " + id + "\nNome: " + super.getNome() + "     CPF: " + super.getCpf() + "\nTelefone: " + super.getTelefone() + "\nEndereço: " + endereco;
+    }
+
 }

@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import model.Cliente;
 
@@ -35,6 +36,35 @@ public class ClienteDAO {
             return null;
         } catch (SQLException e) {
             return null;
+        }
+    }
+
+    public ArrayList<Cliente> listarClientes () {
+        ArrayList<Cliente> clientes = new ArrayList<>();
+        String sql = "SELECT * FROM cliente order by id_cliente ASC";
+        try (Connection conn = ConexaoDAO.getConnection();){
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                clientes.add(new Cliente(rs.getInt("id_cliente"), rs.getString("nome"), rs.getString("cpf"), rs.getString("telefone"), rs.getString("endereco")));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return clientes;
+    }
+
+    public String alterarCliente (int id, String coluna, String valor) {
+        String sql = "UPDATE cliente SET " + coluna + " = ? WHERE id_cliente = ?";
+        try (Connection conn = ConexaoDAO.getConnection();){
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, valor);
+            stmt.setInt(2, id);
+            stmt.executeUpdate();
+            return "\nCliente alterado com sucesso!";
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "Erro ao alterar Cliente";
         }
     }
 

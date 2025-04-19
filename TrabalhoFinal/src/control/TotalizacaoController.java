@@ -20,67 +20,67 @@ public class TotalizacaoController {
         return totalizacaoDAO.buscarTotalizacao(contrato);
     }
     
-    public Double calcularValor (Equipamento equipamento, Contrato contrato, LocalDate dataAtual) {
+    //remover dessa classe
+    public Double calcularValor (int forma, int tipo, Equipamento equipamento, Contrato contrato, LocalDate dataAtual) {
         double total = 0;
         LocalDate dataFim = LocalDate.parse(contrato.getDataFim().substring(0,10));
 
-        if (dataAtual.isAfter(dataFim)) {
-            if (contrato.getTipo() == 1) {
-                long mesesContratados = ChronoUnit.MONTHS.between(dataFim, dataAtual);
-                total = equipamento.getVlrMensal() * mesesContratados;
-                total *= contrato.getQtdEquip();
-            } else {
-                long diasContratados = ChronoUnit.DAYS.between(dataFim, dataAtual);
-                total = equipamento.getVlrDiaria() * diasContratados;
-                total *= contrato.getQtdEquip();
-            } 
-        } else if (dataAtual.isBefore(dataFim)) {
-            if (contrato.getTipo() == 1) {
-                long mesesContratados = ChronoUnit.MONTHS.between(dataAtual, dataFim);
-                total = equipamento.getVlrMensal() * mesesContratados;
-                total *= contrato.getQtdEquip();
-            } else {
-                long diasContratados = ChronoUnit.DAYS.between(dataAtual, dataFim);
-                total = equipamento.getVlrDiaria() * diasContratados;
-                total *= contrato.getQtdEquip();
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate dataContratoFim = LocalDate.parse(contrato.getDataFim(), formato);
+        LocalDate dataContratoInicio = LocalDate.parse(contrato.getDataInicio(), formato);
+
+        if (contrato.getTipo() == 1) { //Calcular o valor do contrato mensal
+            long mesesContratados = ChronoUnit.MONTHS.between(dataContratoInicio, dataContratoFim);
+            total= (equipamento.getVlrMensal()*mesesContratados)*contrato.getQtdEquip();
+        } else if (contrato.getTipo() == 2) { //Calcular o valor do contrato diario
+            long diasContratados = ChronoUnit.DAYS.between(dataContratoInicio, dataContratoFim);
+            total= (equipamento.getVlrDiaria()*diasContratados)*contrato.getQtdEquip();
+        }
+
+        if (forma == 1) { //Calcular o valor na finalização do contrato
+            if (dataAtual.isAfter(dataContratoFim)) {
+                calcularMulta(forma, contrato.getTipo(), total);
+                calcularJuros(contrato.getTipo(), total, dataAtual, dataFim);
             }
-        } else {
-            DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate dataContrato = LocalDate.parse(contrato.getDataInicio(), formato);
-            if (contrato.getTipo() == 1) {
-                long diasUtilizados = ChronoUnit.DAYS.between(dataContrato, dataAtual);
-                double vlrDiariaMes = equipamento.getVlrMensal()/30;
-                total = vlrDiariaMes * diasUtilizados;
-            } else {
-                long diasContratados = ChronoUnit.DAYS.between(dataContrato, dataAtual);
-                total = equipamento.getVlrDiaria() * diasContratados;
-            }
+        } else if (forma == 2) { //Calcular o valor no cancelamento do contrato
+            calcularMulta(forma, contrato.getTipo(), total);
         }
 
         return total;
     }
 
-    public Double calcularMulta (int forma, double valor) {
+    //remover dessa classe
+    public Double calcularMulta (int forma, int tipo, double valor) {
         double total = 0;
         if (forma == 1) {
-            total = valor*0.20; 
+            if (tipo == 1) { // 20% de multa para finalização mensal e 50% para finalização diario
+                total = valor*0.20;
+            } else {
+                total = valor*0.50;
+            }
         } else {
-            total = valor*0.50;
+            if (tipo == 1) { // 50% de multa para cancelamento mensal e 70% para cancelamento diario
+                total = valor*0.50;
+            } else {
+                total = valor*0.70;
+            }
         }
         return total;
     }
                 
-    public Double calcularJuros (int forma, double valor, LocalDate dataAtual, LocalDate dataFim) {
+    //remover dessa classe
+    public Double calcularJuros (int tipo, double valor, LocalDate dataAtual, LocalDate dataFim) {
         long diasAtrasados = ChronoUnit.DAYS.between(dataFim, dataAtual);
         double total = 0;
-        if (forma==1) {
-            total = ((diasAtrasados*0.10)*valor);
+        if (tipo==1) {
+            total = ((diasAtrasados*0.01)*valor);
         } else {
-            total = ((diasAtrasados*0.20)*valor);
+            total = ((diasAtrasados*0.02)*valor);
         }
         return total;
     }
 
+    //remover dessa classe
     public Double calcularTotal (double total, double multa, double juros) {
         double totalFinal = total + multa + juros;
         return totalFinal;

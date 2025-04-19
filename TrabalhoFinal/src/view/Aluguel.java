@@ -325,6 +325,7 @@ public class Aluguel {
             System.out.print("\nDigite o ID do equipamento que deseja alugar: ");
             try {
                 idEquip = scanner.nextInt();
+                scanner.nextLine();
                 control= true;
             } catch (InputMismatchException e) {
                 System.out.println("\nInforme um valor válido!\n");
@@ -340,6 +341,7 @@ public class Aluguel {
                 System.out.print("Informe a Quantidade do equipamento que será alugado: ");
                 try {
                     qtdEquip= scanner.nextInt();
+                    scanner.nextLine();
                     control= true;
                 } catch (InputMismatchException e) {
                     System.out.println("\nInforme um valor válido!\n");
@@ -352,35 +354,39 @@ public class Aluguel {
             } while (!control);
             control2= aluguel.verificarQuantidadeEquipamento(equipamentoController, idEquip, qtdEquip);
         }while(!control2);
-        scanner.nextLine();
-        String dataConvert= "";
-        LocalDate dataFim= null; 
+        int tempo;
         LocalDate dataAtual = LocalDate.now();
+        LocalDate dataFim= null;
         do {
-            System.out.print("\nInforme a Data de entrega do equipamento (DIA-MêS-ANO): ");
-            dataConvert = scanner.nextLine().trim();
+            if (tipo == 1) {
+                System.out.print("\nTempo de permanência (Quantidade de Meses): ");
+            } else {
+                System.out.print("\nTempo de permanência (Quantidade de Dias): ");
+            }
+            tempo = scanner.nextInt();
+            scanner.nextLine();
             try {
-                DateTimeFormatter formatacao = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-                dataFim = LocalDate.parse(dataConvert, formatacao);
                 if (tipo == 1) {
-                    LocalDate dataAtualComparacao = dataAtual.plusDays(30);
-                    if (dataFim.isBefore(dataAtualComparacao)) {
-                        System.out.println("Permanencia mínima de 1 mês, informe outra data!");
+                    if (tempo <= 0) {
+                        System.out.println("Permanência mínima de 1 mês!");
                         control= false;
                     } else {
+                        int temp= tempo*30;
+                        dataFim = dataAtual.plusDays(temp); //Adiciona a quantidade de dias refente a quantidade de meses
                         control= true;
                     }
                 } else {
-                    if (dataFim.isEqual(dataAtual) || dataFim.isBefore(dataAtual)) {
-                        System.out.println("Permanencia mínima de 1 dia, informe outra data!");
+                    if (tempo <= 0) {
+                        System.out.println("Permanencia mínima de 1 dia!");
                         control= false;
                     } else {
+                        dataFim = dataAtual.plusDays(tempo);
                         control= true;
                     }
                 }
                 
             } catch (InputMismatchException e) {
-                System.out.println("\nInforme uma data válida!\n");
+                System.out.println("\nInforme uma quantidade válida!\n");
                 System.out.print("ENTER...");
                 scanner.nextLine();
                 LimpaTela.limpar();
@@ -392,124 +398,136 @@ public class Aluguel {
         int idCliente = cliente.getId();
         System.out.println(contratoController.cadastrarContrato(tipo, idCliente, idEquip, qtdEquip, dataAtual, dataFim));
         Contrato contrato = contratoController.ultimoContrato();
-        double total= obterValor(idEquip, contrato, contratoController, equipamentoController, totalizacaoController);
+        double total= obterValor(0, tipo, idEquip, contrato, contratoController, equipamentoController, totalizacaoController);
         DateTimeFormatter formatacao = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         String dataFormatada = dataFim.format(formatacao);
         System.out.println("----------------------\n" + 
                            "Total: R$" + total + " a serem pagos em " + dataFormatada + "\n" +
                            "----------------------");
-        System.out.print("\nEnter para prosseguir...");
+        System.out.print("\nENTER...");
         scanner.nextLine();
     }
 
-    public Double obterValor(int idEquip, Contrato contrato, ContratoController contratoController, EquipamentoController equipamentoController, TotalizacaoController totalizacaoController) {
+    public Double obterValor(int forma, int tipo, int idEquip, Contrato contrato, ContratoController contratoController, EquipamentoController equipamentoController, TotalizacaoController totalizacaoController) {
         Equipamento equipamento = equipamentoController.buscarEquipamento(idEquip);
         LocalDate dataAtual = LocalDate.now();
-        return totalizacaoController.calcularValor(equipamento, contrato, dataAtual);
+        return totalizacaoController.calcularValor(forma, tipo, equipamento, contrato, dataAtual);
     }
 
     public void encerrarContrato(Aluguel aluguel, Scanner scanner, ContratoController contratoController, EquipamentoController equipamentoController, TotalizacaoController totalizacaoController) {
         LimpaTela.limpar();
-        boolean control= true;
+
+        LocalDate dataAtual = LocalDate.now();
+        boolean control= true, control1= true;
         int forma= 0;
         String formaS= "";
+
         do {
-            System.out.print("Como deseja encerrar o contrato? 1- Finalizar 2- Cancelar ");
+            System.out.println("Como deseja encerrar o contrato? 1- Finalizar (Vence hoje ou Já venceu) | 2- Cancelar (À vencer) | 3- Voltar");
+            System.out.print(" > ");
             try {
                 forma= scanner.nextInt();
+
                 if (forma == 1 || forma == 2) {
                     control= true;
+                } else if (forma == 3) {
+                    control= true;
+                    control1= false;
                 } else {
                     System.out.println("\nInforme 1 ou 2!\n");
                     control= false;
                 }
+
             } catch (InputMismatchException e) {
                 System.out.println("\nInforme um valor válido!\n");
                 scanner.next();
                 control= false;
             }
         } while (!control);
-        LocalDate dataAtual = LocalDate.now();
-        if (forma==1) {
-            formaS= "F";
-            if (aluguel.listarContratosAtivos(forma, scanner, contratoController, dataAtual)) {
-                scanner.nextLine();
-                return;
+        
+        if (control1) {
+            if (forma == 1) {
+                formaS= "F";
+    
+                if (aluguel.listarContratosAtivos(forma, scanner, contratoController, dataAtual)) {
+                    scanner.nextLine();
+                    return;
+                }
+            } else if (forma == 2) {
+                formaS= "C";
+                
+                if (aluguel.listarContratosAtivos(forma, scanner, contratoController, dataAtual)) {
+                    scanner.nextLine();
+                    return;
+                }
             }
-        } else {
-            formaS= "C";
-            if (aluguel.listarContratosAtivos(forma, scanner, contratoController, dataAtual)) {
-                scanner.nextLine();
-                return;
+    
+            System.out.print("Informe o ID do Contrato que deseja encerrar: ");
+            int id= scanner.nextInt();
+    
+            System.out.println("\n"+contratoController.encerrarContrato(id, formaS, dataAtual));
+            Contrato contrato = contratoController.buscarContrato(id);
+            LocalDate dataFim = LocalDate.parse(contrato.getDataFim().substring(0,10));
+            
+            double valor = obterValor(forma, 0, contrato.getIdEquip(), contrato, contratoController, equipamentoController, totalizacaoController);
+            double multa = 0, juros = 0, total = 0;
+    
+            if (dataFim.isBefore(dataAtual) ) { // Calcula Multa e Juros para contratos vencidos                         
+                multa= totalizacaoController.calcularMulta(forma, contrato.getTipo(), valor);
+                juros= totalizacaoController.calcularJuros(contrato.getTipo(), valor, dataAtual, dataFim);
+            } else if (dataFim.isAfter(dataAtual)) { // Calcula Multa para cancelamento do contrato
+                multa= totalizacaoController.calcularMulta(forma, contrato.getTipo(), valor);
             }
+
+            total= totalizacaoController.calcularTotal(valor, multa, juros);
+            System.out.println( "   Valor: R$" + valor + "\n" +
+                                "   Multa: R$" + multa + "\n" +
+                                "   Juros: R$" + juros + "\n" +
+                                "----------------------" + "\n" +
+                                "   Total: R$" + total);
+            scanner.nextLine();
+            System.out.println(totalizacaoController.realizarTotalizacao(id, valor, multa, juros, total)); 
         }
-        System.out.print("Informe o ID do Contrato que deseja encerrar: ");
-        int id= scanner.nextInt();
-        System.out.println("\n"+contratoController.encerrarContrato(id, formaS, dataAtual));
-        Contrato contrato = contratoController.buscarContrato(id);
-        LocalDate dataFim = LocalDate.parse(contrato.getDataFim().substring(0,10));
-        double valor = obterValor(contrato.getIdEquip(), contrato, contratoController, equipamentoController, totalizacaoController);
-        double multa = 0, juros = 0, total = 0;
-        total= totalizacaoController.calcularTotal(valor, multa, juros);
-
-        if (dataFim.isBefore(dataAtual) ) {                             
-            multa= totalizacaoController.calcularMulta(forma, valor);
-            juros= totalizacaoController.calcularJuros(forma, dataAtual, dataFim); //CALCUMA MESMO AO FINALIZAR CONTRATO COM DATA IGUAL A ONTEM
-        } else if (dataFim.isAfter(dataAtual)) {
-            multa= totalizacaoController.calcularMulta(forma, valor);
-        }
-
-        total= totalizacaoController.calcularTotal(valor, multa, juros);
-        aluguel.exibirValores(scanner, valor, multa, juros, total);
-        System.out.println(totalizacaoController.realizarTotalizacao(id, valor, multa, juros, total));
-    }
-
-    public void exibirValores(Scanner scanner, double valor, double multa, double juros, double total) {
-        System.out.println( "   Valor: R$" + valor + "\n" +
-                            "   Multa: R$" + multa + "\n" +
-                            "   Juros: R$" + juros + "\n" +
-                            "----------------------" + "\n" +
-                            "   Total: R$" + total);
-        scanner.nextLine();
+        
     }
 
     public boolean listarContratosAtivos(int forma, Scanner scanner, ContratoController contratoController, LocalDate dataAtual) {
         LimpaTela.limpar();
+
         ArrayList<Contrato> contratos = contratoController.listarContratoAtivo();
+        Iterator<Contrato> iterator = contratos.iterator();
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        
         if (contratos.isEmpty()) {
             System.out.println("Não existem contratos Ativos!");
             return true;
         }
-        int cont= 0;
-        Iterator<Contrato> iterator = contratos.iterator();
+        
+        int qtdFin = 0, qtdCan = 0;
+
         while (iterator.hasNext()) {
             Contrato contrato = iterator.next();
-
-            DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             LocalDate dataContrato = LocalDate.parse(contrato.getDataFim(), formato);
-
-            if (forma == 1) { // Finalizar contratos
-                if (!dataAtual.isAfter(dataContrato) && !dataAtual.equals(dataContrato)) {
-                    if (cont==0) {
-                        System.out.println("Não existem contratos disponiveis para Finalizar, tente Cancelar!");
-                        return true;
-                    }
-                    continue;
-                }
-            } else if (forma == 2) { // Cancelar contratos
-                if (dataAtual.isAfter(dataContrato) || dataAtual.equals(dataContrato)) {
-                    if (cont==0) {
-                        System.out.println("Não existem contratos disponiveis para Cancelar, tente Finalizar!");
-                        return true;
-                    }
-                    continue;
-                }
+            boolean finaliza = dataAtual.isAfter(dataContrato) || dataAtual.equals(dataContrato);
+            boolean cancela = dataAtual.isBefore(dataContrato) && !dataAtual.equals(dataContrato);
+            
+            if (forma == 1 && finaliza) {
+                System.out.println(contrato.exibirDetalhes() +
+                                   "\n--------------------------------------------------------------------");
+                qtdFin++;
+            } else if (forma == 2 && cancela) {
+                System.out.println(contrato.exibirDetalhes() +
+                                   "\n--------------------------------------------------------------------");
+                qtdCan++;
             }
-            System.out.println(contrato.exibirDetalhes());
-            cont++;
-
-            System.out.println("-------------------------------------------------");
+            
         }
+
+        if (qtdFin == 0 && qtdCan == 0) {
+            System.out.println("Não encontrado contratos para Finalização/Cancelamento");
+            return true;
+        }
+
         return false;
     }
 
